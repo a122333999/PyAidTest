@@ -1,0 +1,84 @@
+
+
+
+{
+	"type": "group",
+	"iden": "UUID",
+	"name": "测试TransmitPage",
+	"desc": "测试TransmitPage的测试组",
+	
+	"cases": [
+		{
+			"type": "case",
+			"iden": "UUID",
+			"name": "创建ETH报文1",
+			"desc": "创建一个ETH报文的测试用例",
+			
+			"actions": [
+				{
+					"type": "check",
+					"iden": "UUID",
+					"name": "打开菜单",
+					"desc": ".......",
+					
+					"class": "simpleness|sampleing"
+					"delay": 1000,
+					"retry": 0,
+					
+					"config": { // sampleing
+						// 普通检查: 图片路径target[] 
+						// 采样检查: 时间time 总次数count 命中次数hit
+					}
+				},
+				{
+					"type": "operate",
+					"iden": "UUID",
+					"name": "点击菜单",
+					"desc": ".......",
+					
+					"class": "点击|左击|右击|双击|长按左键|长按右键|滚动|按键|组合键|长按键|复制到",
+					"delay": 1000,
+					"retry": 0,
+					"config": {
+						// 点击: 点击坐标
+						// 左击: 点击坐标
+						// 右击: 点击坐标
+						// 双击: 点击坐标
+						// 长按左键: 点击坐标 长按时长
+						// 长按右键: 点击坐标 长按时长
+						// 滚动: 滚动坐标 滚动单位
+						// 按键: 按键值
+						// 组合键: 组合键值
+						// 长按键: 按键值 长按时长
+						// 复制到: 复制内容 粘贴位置
+					}
+				},
+				{
+					"type": "control",
+					"iden": "UUID",
+					"name": "如果找到目标",
+					"desc": ".......",
+
+					"class": "fork",
+					"delay": 1000,
+					"retry": 0,
+					"config": {
+						"true": "UUID",
+						"false": "UUID",
+					}
+				},
+				{
+					"type": "empty",
+					"iden": "UUID",
+					"name": "空节点",
+					"desc": "空白节点",
+
+					"class": "",
+					"delay": 1000,
+					"retry": 0,
+					"config": {}
+				},
+			]
+		}
+	]
+}
