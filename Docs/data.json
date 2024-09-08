@@ -13,7 +13,8 @@
 			"iden": "UUID",
 			"name": "创建ETH报文1",
 			"desc": "创建一个ETH报文的测试用例",
-			
+
+			"start": "UUID",
 			"actions": [
 				{
 					"type": "check",
@@ -21,13 +22,16 @@
 					"name": "打开菜单",
 					"desc": ".......",
 					
-					"class": "simpleness|sampleing"
+					"class": "simpleness|sampleing",
 					"delay": 1000,
 					"retry": 0,
+					"child": "UUID",
+					"runtime": "UUID",
 					
-					"config": { // sampleing
-						// 普通检查: 图片路径target[] 
-						// 采样检查: 时间time 总次数count 命中次数hit
+					"config": {
+						// 通用数据: 图片列表 坐标矩形 基准点 偏移量
+						// 普通检查的数据: 无
+						// 采样检查的数据: 时长 总次数 命中次数
 					}
 				},
 				{
@@ -36,10 +40,11 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "点击|左击|右击|双击|长按左键|长按右键|滚动|按键|组合键|长按键|复制到",
+					"class": "点击|左击|右击|双击|长按左键|长按右键|鼠标移动|鼠标拖动|滚动|按键|组合键|长按键|复制到",
 					"delay": 1000,
 					"retry": 0,
 					"config": {
+						// 通用数据:
 						// 点击: 点击坐标
 						// 左击: 点击坐标
 						// 右击: 点击坐标
