@@ -1,14 +1,6 @@
 import uuid
 
 
-def _isUuidStr(text):
-    try:
-        uuid.UUID(text)
-        return True
-    except ValueError:
-        return False
-
-
 class TestBase(object):
 
     _type = "base"
@@ -45,4 +37,12 @@ class TestBase(object):
     @classmethod
     def getType(cls):
         return cls._type
+
+
+def _isUuidStr(text):
+    try:
+        uuid.UUID(text)
+        return True
+    except ValueError:
+        return False
 

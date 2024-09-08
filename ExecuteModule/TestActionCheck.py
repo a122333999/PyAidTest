@@ -21,7 +21,12 @@ class TestActionCheck(TestAction):
 
     def start(self, rtd):
         print("start check", rtd, self.getName(), self.getIden())
-        return TestResult()
+        if self.getClass() == 'simple':
+            return _simpleCheck()
+        elif self.getClass() == 'sample':
+            return _sampleCheck()
+        else:
+            return TestResult()
 
     def stop(self):
         print("stop check", self.getName(), self.getIden())
@@ -55,3 +60,11 @@ def _returnConfigHit(data):
     if isinstance(data, int) and 0 < data:
         return data
     return _defaultHit
+
+
+def _simpleCheck():
+    return TestResult()
+
+
+def _sampleCheck():
+    return TestResult()

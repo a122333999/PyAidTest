@@ -14,7 +14,11 @@ class TestActionEmpty(TestAction):
 
     def start(self, rtd):
         print("start empty", rtd, self.getName(), self.getIden())
-        return TestResult()
+        return _noneEmpty()
 
     def stop(self):
         print("stop empty", self.getName(), self.getIden())
+
+
+def _noneEmpty():
+    return TestResult()

@@ -22,14 +22,12 @@
 					"name": "打开菜单",
 					"desc": ".......",
 					
-					"class": "simpleness|sampleing",
+					"class": "simple(简单检查)|sample(采样检查)",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",
-					"runtime": "UUID",
-					
 					"config": {
-						// 通用数据: 图片列表 坐标矩形 基准点 偏移量
+						// 通用数据: 图片列表
 						// 普通检查的数据: 无
 						// 采样检查的数据: 时长 总次数 命中次数
 					}
@@ -40,21 +38,21 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "点击|左击|右击|双击|长按左键|长按右键|鼠标移动|鼠标拖动|滚动|按键|组合键|长按键|复制到",
+					"class": "click(点击)|leftClick(左击)|rightClick(右击)|doubleClick(双击)|move(鼠标移动)|drag(鼠标拖动)|wheel(滚动)|key(按键)|keys(组合键)|copyTo(复制到)",
 					"delay": 1000,
 					"retry": 0,
+					"child": "UUID",
 					"config": {
 						// 通用数据:
 						// 点击: 点击坐标
-						// 左击: 点击坐标
-						// 右击: 点击坐标
 						// 双击: 点击坐标
-						// 长按左键: 点击坐标 长按时长
-						// 长按右键: 点击坐标 长按时长
+						// 左击: 点击坐标 持续时间
+						// 右击: 点击坐标 持续时间
+						// 移动: 目的坐标 持续时间
+						// 拖动: 目的坐标 持续时间
 						// 滚动: 滚动坐标 滚动单位
-						// 按键: 按键值
+						// 按键: 按键值 持续时间
 						// 组合键: 组合键值
-						// 长按键: 按键值 长按时长
 						// 复制到: 复制内容 粘贴位置
 					}
 				},
@@ -64,9 +62,10 @@
 					"name": "如果找到目标",
 					"desc": ".......",
 
-					"class": "fork",
+					"class": "fork(分叉)|finished(完成)|failed(失败)|waiting(等待)",
 					"delay": 1000,
 					"retry": 0,
+					"child": "UUID",
 					"config": {
 						"true": "UUID",
 						"false": "UUID",
@@ -78,9 +77,10 @@
 					"name": "空节点",
 					"desc": "空白节点",
 
-					"class": "",
+					"class": "none",
 					"delay": 1000,
 					"retry": 0,
+					"child": "UUID",
 					"config": {}
 				},
 			]
