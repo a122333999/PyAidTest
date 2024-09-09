@@ -1,5 +1,6 @@
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
+from ExecuteModule.TestResult import ExecStatus
 
 
 class TestActionEmpty(TestAction):
@@ -12,13 +13,15 @@ class TestActionEmpty(TestAction):
         self.setName("TestEmpty")
         self.setDesc("This TestEmpty")
 
-    def start(self, rtd):
-        print("start empty", rtd, self.getName(), self.getIden())
-        return _noneEmpty()
+    def start(self):
+        print("start empty", self.getName(), self.getIden())
+        return _noneEmpty(self.getChild())
 
     def stop(self):
         print("stop empty", self.getName(), self.getIden())
 
 
-def _noneEmpty():
-    return TestResult()
+def _noneEmpty(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result

@@ -1,5 +1,6 @@
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
+from ExecuteModule.TestResult import ExecStatus
 
 
 class TestActionOperate(TestAction):
@@ -10,71 +11,91 @@ class TestActionOperate(TestAction):
         self.setName("TestOperate")
         self.setDesc("This TestOperate")
 
-    def start(self, rtd):
-        print("start operate", rtd, self.getName(), self.getIden())
+    def start(self):
+        print("start operate", self.getName(), self.getIden())
         if self.getClass() == 'click':
-            return _clickOperate()
+            return _clickOperate(self.getChild())
         elif self.getClass() == 'leftClick':
-            return _leftClickOperate()
+            return _leftClickOperate(self.getChild())
         elif self.getClass() == 'rightClick':
-            return _rightClickOperate()
+            return _rightClickOperate(self.getChild())
         elif self.getClass() == 'doubleClick':
-            return _doubleClickOperate()
+            return _doubleClickOperate(self.getChild())
         elif self.getClass() == 'move':
-            return _moveOperate()
+            return _moveOperate(self.getChild())
         elif self.getClass() == 'drag':
-            return _dragOperate()
+            return _dragOperate(self.getChild())
         elif self.getClass() == 'wheel':
-            return _wheelOperate()
+            return _wheelOperate(self.getChild())
         elif self.getClass() == 'key':
-            return _keyOperate()
+            return _keyOperate(self.getChild())
         elif self.getClass() == 'keys':
-            return _keysOperate()
+            return _keysOperate(self.getChild())
         elif self.getClass() == 'copyTo':
-            return _copyToOperate()
+            return _copyToOperate(self.getChild())
         else:
-            return TestResult()
+            return TestResult(ExecStatus.ErrorStatus)
 
     def stop(self):
         print("stop operate", self.getName(), self.getIden())
 
 
-def _clickOperate():
-    return TestResult()
+def _clickOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _leftClickOperate():
-    return TestResult()
+def _leftClickOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _rightClickOperate():
-    return TestResult()
+def _rightClickOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _doubleClickOperate():
-    return TestResult()
+def _doubleClickOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _moveOperate():
-    return TestResult()
+def _moveOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _dragOperate():
-    return TestResult()
+def _dragOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _wheelOperate():
-    return TestResult()
+def _wheelOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _keyOperate():
-    return TestResult()
+def _keyOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _keysOperate():
-    return TestResult()
+def _keysOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _copyToOperate():
-    return TestResult()
+def _copyToOperate(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 

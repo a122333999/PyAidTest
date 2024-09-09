@@ -62,7 +62,7 @@
 					"name": "如果找到目标",
 					"desc": ".......",
 
-					"class": "fork(分叉)|finished(完成)|failed(失败)|waiting(等待)",
+					"class": "fork(分叉)|input(输入)|finished(完成)|failed(失败)|script(脚本)",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",

@@ -1,4 +1,5 @@
 import uuid
+from UtilsModule.CommonUtils import CommonUtils
 
 
 class TestBase(object):
@@ -12,10 +13,8 @@ class TestBase(object):
         self._desc = "This BaseTest"
 
     def setIden(self, iden):
-        if isinstance(iden, str) and _isUuidStr(iden):
-            self._iden = uuid.UUID(iden)
-        elif isinstance(iden, uuid.UUID):
-            self._iden = iden
+        if ret := CommonUtils.checkUuid(iden):
+            self._iden = ret
         else:
             raise TypeError("设置的的UUID不被支持", iden)
 
@@ -39,10 +38,5 @@ class TestBase(object):
         return cls._type
 
 
-def _isUuidStr(text):
-    try:
-        uuid.UUID(text)
-        return True
-    except ValueError:
-        return False
+
 

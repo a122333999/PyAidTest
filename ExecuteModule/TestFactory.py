@@ -8,13 +8,7 @@ from ExecuteModule.TestActionOperate import TestActionOperate
 from ExecuteModule.TestActionEmpty import TestActionEmpty
 
 
-def _readFile(path):
-    try:
-        with open(path, "rb") as fp:
-            return json.load(fp)
-    except Exception as e:
-        return e
-
+# TODO: 验证UUID是否有效
 
 class TestFactory:
 
@@ -56,6 +50,7 @@ class TestFactory:
             result.setName(data['name'])
             result.setIden(data['iden'])
             result.setDesc(data['desc'])
+            result.setHeader(data['header'])
             if only is False:
                 actions: list = data.get('actions', list())
                 for item in actions:
@@ -88,6 +83,7 @@ class TestFactory:
             result.setClass(data['class'])
             result.setDelay(data['delay'])
             result.setRetry(data['retry'])
+            result.setChild(data['child'])
             result.setConfig(data['config'])
 
         return result
@@ -95,3 +91,11 @@ class TestFactory:
     @staticmethod
     def formatAction():
         pass
+
+
+def _readFile(path):
+    try:
+        with open(path, "rb") as fp:
+            return json.load(fp)
+    except Exception as e:
+        return e

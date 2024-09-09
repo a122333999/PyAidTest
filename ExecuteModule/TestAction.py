@@ -1,5 +1,6 @@
 from ExecuteModule.TestBase import TestBase
 from ExecuteModule.TestResult import TestResult
+from UtilsModule.CommonUtils import CommonUtils
 
 
 class TestAction(TestBase):
@@ -10,8 +11,9 @@ class TestAction(TestBase):
         self._class = ""
         self._delay = 500
         self._retry = 0
+        self._child = None
 
-    def start(self, rtd):
+    def start(self) -> TestResult:
         pass
 
     def stop(self):
@@ -26,6 +28,10 @@ class TestAction(TestBase):
     def setRetry(self, data):
         self._retry = data
 
+    def setChild(self, child):
+        if ret := CommonUtils.checkUuid(child):
+            self._child = ret
+
     def setConfig(self, data):
         pass
 
@@ -37,6 +43,9 @@ class TestAction(TestBase):
 
     def getRetry(self):
         return self._retry
+
+    def getChild(self):
+        return self._child
 
     def getConfig(self):
         pass

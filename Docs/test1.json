@@ -11,7 +11,7 @@
 			"name": "创建ETH报文1",
 			"desc": "创建一个ETH报文的测试用例",
 
-			"start": "741ee909-d55c-45b5-8516-20ed160479cc",
+			"header": "741ee909-d55c-45b5-8516-20ed160479cc",
 			"actions": [
 				{
 					"type": "check",
@@ -19,9 +19,10 @@
 					"name": "打开菜单",
 					"desc": ".......",
 					
-					"class": "simpleness",
+					"class": "simple",
 					"delay": 1000,
 					"retry": 0,
+					"child": "9a0fff5c-3d29-4eba-acae-29f2bf4b52c3",
 					
 					"config": {
 						"target": [],
@@ -36,9 +37,10 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "点击|左击|右击|双击|长按左键|长按右键|滚动|按键|组合键|长按键|复制到",
+					"class": "click",
 					"delay": 1000,
 					"retry": 0,
+					"child": "0fe433e2-f488-465c-aa06-9411e0490a3a",
 					"config": {
 
 					}
@@ -52,6 +54,7 @@
 					"class": "fork",
 					"delay": 1000,
 					"retry": 0,
+					"child": "7749684f-7ddf-4d8f-85c1-614d890c5165",
 					"config": { }
 				},
 				{
@@ -63,6 +66,7 @@
 					"class": "",
 					"delay": 1000,
 					"retry": 0,
+					"child": null,
 					"config": {}
 				}
 			]

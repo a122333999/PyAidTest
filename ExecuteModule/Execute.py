@@ -2,7 +2,10 @@ from uuid import UUID
 from PySide6 import QtCore
 from ExecuteModule.TestGroup import TestGroup
 from ExecuteModule.TestFactory import TestFactory
+from ExecuteModule.TestRuntime import TestRuntime
 
+
+# TODO: 模块重入限制
 
 class Execute(QtCore.QObject):
     # 测试信号
@@ -25,23 +28,37 @@ class Execute(QtCore.QObject):
         self._handleList.pop(handle)
 
     def start(self, handle, case: int | UUID):  # 启动指定用例
-        search = _findCase(self._handleList, handle, case)
-        if search is not None:
-            search.start()
-            return True
+        if not TestRuntime.isRunning and not TestRuntime.isWaiting and not TestRuntime.isStopping:
+            if search := _findCase(self._handleList, handle, case):
+                TestRuntime.currHandle = handle
+                search.start()
+                return True
         return False
 
     def startAll(self, handle):  # 启动整个组
-        search = _findGroup(self._handleList, handle)
-        if search is not None:
-            for case in search.getCaseList():
-                ret = case.start()
-                if ret is False:
-                    return False
+        if not TestRuntime.isRunning and not TestRuntime.isWaiting and not TestRuntime.isStopping:
+            if search := _findGroup(self._handleList, handle):
+                TestRuntime.currHandle = handle
+                for case in search.getCaseList():
+                    ret = case.start()
+                    if ret is False:
+                        return False
         return True
 
     def stop(self, handle):  # 停止测试
-        pass
+        if handle in self._handleList.keys():
+            if TestRuntime.isRunning or TestRuntime.isWaiting:
+                TestRuntime.isRunning = False
+                TestRuntime.isWaiting = False
+                TestRuntime.isStopping = True
+
+    def input(self, handle, data):
+        if handle in self._handleList.keys():
+            if TestRuntime.isWaiting:
+                TestRuntime.inputData = data
+                TestRuntime.isRunning = True
+                TestRuntime.isWaiting = False
+                TestRuntime.isStopping = False
 
     def getHandleList(self):
         result = list()

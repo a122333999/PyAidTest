@@ -1,5 +1,6 @@
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
+from ExecuteModule.TestResult import ExecStatus
 
 
 class TestActionControl(TestAction):
@@ -11,16 +12,18 @@ class TestActionControl(TestAction):
         self.setName("TestControl")
         self.setDesc("This TestControl")
 
-    def start(self, rtd):
-        print("start control", rtd, self.getName(), self.getIden())
+    def start(self):
+        print("start control", self.getName(), self.getIden())
         if self.getClass() == 'fork':
-            return _forkControl()
+            return _forkControl(self.getChild())
+        elif self.getClass() == 'input':
+            return _inputControl(self.getChild())
         elif self.getClass() == 'finished':
-            return _finishedControl()
+            return _finishedControl(self.getChild())
         elif self.getClass() == 'failed':
-            return _failedControl()
-        elif self.getClass() == 'waiting':
-            return _waitingControl()
+            return _failedControl(self.getChild())
+        elif self.getClass() == 'script':
+            return _scriptControl(self.getChild())
         else:
             return TestResult()
 
@@ -28,18 +31,33 @@ class TestActionControl(TestAction):
         print("stop control", self.getName(), self.getIden())
 
 
-def _forkControl():
-    return TestResult()
+
+def _forkControl(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _finishedControl():
-    return TestResult()
+def _inputControl(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _failedControl():
-    return TestResult()
+def _finishedControl(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
 
-def _waitingControl():
-    return TestResult()
+def _failedControl(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
+
+
+def _scriptControl(node=None):
+    result = TestResult(ExecStatus.RunningStatus)
+    result.setNext(node)
+    return result
 
