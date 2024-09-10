@@ -1,6 +1,5 @@
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
-from ExecuteModule.TestResult import ExecStatus
 
 
 class TestActionEmpty(TestAction):
@@ -22,6 +21,6 @@ class TestActionEmpty(TestAction):
 
 
 def _noneEmpty(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result

@@ -7,14 +7,14 @@ from ExecuteModule.Execute import Execute
 from WidgetModule.Window import MainWindow
 
 
-@QtCore.Slot(str)
+@QtCore.Slot(dict)
 def testSlot(path):
     print(path)
 
 
 if __name__ == '__main__':
     execute = Execute()
-    execute.testSignal.connect(testSlot)
+    execute.execSignal.connect(testSlot)
 
     ret = execute.load("./Docs/test1.json")
     print(ret)
@@ -28,6 +28,8 @@ if __name__ == '__main__':
     # print(execute.getActionInfo(ret, 0, uuid.UUID('9a0fff5c-3d29-4eba-acae-29f2bf4b52c3')))
 
     execute.start(ret, 0)
+    execute.start(ret, 0)
+    # execute.startAll(ret)
 
     app = QApplication(sys.argv)
     window = MainWindow()

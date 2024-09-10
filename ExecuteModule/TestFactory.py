@@ -57,7 +57,8 @@ class TestFactory:
                     action = TestFactory.parseAction(item)
                     if isinstance(action, TestAction):
                         result.addActionItem(action)
-
+                if result.checkActionList() is False:
+                    return None
             return result
 
     @staticmethod

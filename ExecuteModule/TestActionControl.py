@@ -1,6 +1,5 @@
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
-from ExecuteModule.TestResult import ExecStatus
 
 
 class TestActionControl(TestAction):
@@ -16,8 +15,8 @@ class TestActionControl(TestAction):
         print("start control", self.getName(), self.getIden())
         if self.getClass() == 'fork':
             return _forkControl(self.getChild())
-        elif self.getClass() == 'input':
-            return _inputControl(self.getChild())
+        elif self.getClass() == 'pause':
+            return _pauseControl(self.getChild())
         elif self.getClass() == 'finished':
             return _finishedControl(self.getChild())
         elif self.getClass() == 'failed':
@@ -33,31 +32,31 @@ class TestActionControl(TestAction):
 
 
 def _forkControl(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
 def _inputControl(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
 def _finishedControl(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
 def _failedControl(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
 def _scriptControl(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 

@@ -1,8 +1,9 @@
 import uuid
+from PySide6.QtCore import QObject
 from UtilsModule.CommonUtils import CommonUtils
 
 
-class TestBase(object):
+class TestBase(QObject):
 
     _type = "base"
 

@@ -1,7 +1,6 @@
 import pyautogui
 from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
-from ExecuteModule.TestResult import ExecStatus
 from ExecuteModule.TestRuntime import TestRuntime
 
 _defaultCount = 15
@@ -29,7 +28,7 @@ class TestActionCheck(TestAction):
         elif self.getClass() == 'sample':
             return _sampleCheck(self.getChild())
         else:
-            return TestResult(ExecStatus.ErrorStatus)
+            return TestResult(TestResult.ErrorFlag)
 
     def stop(self):
         print("stop check", self.getName(), self.getIden())
@@ -66,12 +65,12 @@ def _returnConfigHit(data):
 
 
 def _simpleCheck(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
 def _sampleCheck(node=None):
-    result = TestResult(ExecStatus.RunningStatus)
+    result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result

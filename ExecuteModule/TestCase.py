@@ -1,7 +1,7 @@
 import time
+from PySide6 import QtCore
 from ExecuteModule.TestBase import TestBase
 from ExecuteModule.TestAction import TestAction
-from ExecuteModule.TestResult import ExecStatus
 from ExecuteModule.TestResult import TestResult
 from ExecuteModule.TestRuntime import TestRuntime
 from UtilsModule.CommonUtils import CommonUtils
@@ -10,6 +10,9 @@ from UtilsModule.CommonUtils import CommonUtils
 class TestCase(TestBase):
 
     _type = "case"
+
+    """ { flag:int, iden:UUID, message:str } """
+    statusChanged = QtCore.Signal(dict)
 
     def __init__(self):
         super().__init__()
@@ -20,9 +23,9 @@ class TestCase(TestBase):
         self._actionHash = dict()
 
     def start(self):
+        success = False
         if _checkActionList(self._header, self._actionHash):
             current = self._header
-            TestRuntime.clear()
             TestRuntime.isRunning = True
             TestRuntime.currResult = None  # TODO
 
@@ -31,58 +34,68 @@ class TestCase(TestBase):
                 result = action.start()
                 if TestRuntime.isStopping:
                     TestRuntime.clear()
-                    # 发出运行停止信号
+                    self.statusChanged.emit(_packInfo1(result, action, '手动停止'))
                     return True
 
                 while True:
-                    if result.getStatus() == ExecStatus.NoneStatus:
+                    flag = False
+                    if result.getStatus() == TestResult.NoneFlag:
                         TestRuntime.clear()
+                        self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                         # 发出运行错误信号
                         return False
-                    elif result.getStatus() == ExecStatus.ErrorStatus:
+                    if result.getStatus() & TestResult.CriticalFlag:
                         TestRuntime.clear()
-                        # 发出运行错误信号
+                        self.statusChanged.emit(_packInfo1(result, action, '致命错误'))
                         return False
-                    elif result.getStatus() == ExecStatus.FailedStatus:
+                    if result.getStatus() & TestResult.FailedFlag:
                         TestRuntime.clear()
-                        # 发出测试失败信号
+                        self.statusChanged.emit(_packInfo1(result, action, '测试失败'))
                         return True
-                    elif result.getStatus() == ExecStatus.FinishedStatus:
+                    if result.getStatus() & TestResult.FinishedFlag:
                         TestRuntime.clear()
-                        # 发出测试完成信号
+                        self.statusChanged.emit(_packInfo1(result, action, '测试完成'))
                         return True
-                    elif result.getStatus() == ExecStatus.WaitingStatus:
+                    if result.getStatus() & TestResult.ErrorFlag:
+                        TestRuntime.clear()
+                        self.statusChanged.emit(_packInfo1(result, action, '运行错误'))
+                        flag = True
+                    if result.getStatus() & TestResult.WaitingFlag:
                         TestRuntime.isWaiting = True
                         TestRuntime.isRunning = False
-                        # 发出等待输入信号
+                        self.statusChanged.emit(_packInfo1(result, action, '输入数据'))
                         while True:
                             if TestRuntime.isRunning:
                                 result = result.callback(TestRuntime.inputData)
                                 break
                             elif TestRuntime.isStopping:
                                 TestRuntime.clear()
-                                # 发出运行停止信号
+                                self.statusChanged.emit(_packInfo1(result, action, '手动停止'))
                                 return True
                             elif TestRuntime.isWaiting:
                                 time.sleep(0.1)
                                 time.sleep(0.1)
                             else:
                                 TestRuntime.clear()
-                                # 发出运行错误信号
+                                self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                                 return False
-                    elif result.getStatus() == ExecStatus.RunningStatus:
-                        # 发出运行信息信号
+                        flag = True
+                    if result.getStatus() & TestResult.RunningFlag:
+                        self.statusChanged.emit(_packInfo1(result, action, '正在运行'))
                         break
-                    else:
+                    if not flag:
                         TestRuntime.clear()
-                        # 发出运行错误信号
+                        self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                         return False
 
                 TestRuntime.currResult = result
                 TestRuntime.bufferResult[action.getIden()] = result
+                time.sleep(action.getDelay() / 1000)
                 current = result.getNext()
-        else:
-            # 发出运行错误信号
+                success = True
+
+        if not success:
+            self.statusChanged.emit(_packInfo1(TestResult, None, '流程异常'))
             return False
 
     def setHeader(self, header):
@@ -114,3 +127,10 @@ def _checkActionList(header, actions):
             return False
     return True
 
+
+def _packInfo1(flag, iden=None, msg=None):
+    if isinstance(flag, TestResult):
+        flag = flag.getStatus()
+    if isinstance(iden, TestAction):
+        iden = iden.getIden()
+    return {'flag': flag, 'iden': iden, 'msg': msg}
