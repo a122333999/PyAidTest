@@ -1,3 +1,4 @@
+from ExecuteModule.TestInput import TestInput
 
 
 class TestRuntime:
@@ -5,20 +6,27 @@ class TestRuntime:
     isWaiting = False
     isStopping = False
 
-    currHandle = 0
-    currResult = None
-    bufferResult = dict()
+    currentHandle = 0
+    currentResult = None
+    historyResult = dict()
 
-    inputData = object()
-    errorInfo = list()
+    buffInfo = None
+    inputData = None
+    errorList = list()
 
     @classmethod
     def clear(cls):
         cls.isRunning = False
         cls.isWaiting = False
         cls.isStopping = False
-        cls.currHandle = 0
-        cls.currResult = None
-        cls.bufferResult = dict()
-        cls.inputData = object()
+        cls.currentHandle = 0
+        cls.currentResult = None
+        cls.historyResult = dict()
+        cls.inputData = None
         cls.errorInfo = list()
+
+    @classmethod
+    def toAbsPath(cls):
+        """把路径转换成绝对路径 也就是替换 ${app} ${pro} ${case} """
+        pass
+

@@ -21,12 +21,16 @@ class TestActionCheck(TestAction):
         self._configHit = _defaultHit
 
     def start(self):
-        rtd = TestRuntime.currResult
+        rtd = TestRuntime.currentResult
         print("start check", rtd, self.getName(), self.getIden())
-        if self.getClass() == 'simple':
-            return _simpleCheck(self.getChild())
-        elif self.getClass() == 'sample':
-            return _sampleCheck(self.getChild())
+        if self.getClass() == 'text':
+            return _textCheck(self.getChild())
+        elif self.getClass() == 'image':
+            return _imageCheck(self.getChild())
+        elif self.getClass() == 'texts':
+            return _textsCheck(self.getChild())
+        elif self.getClass() == 'images':
+            return _imagesCheck(self.getChild())
         else:
             return TestResult(TestResult.ErrorFlag)
 
@@ -64,13 +68,25 @@ def _returnConfigHit(data):
     return _defaultHit
 
 
-def _simpleCheck(node=None):
+def _textCheck(node=None):
     result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result
 
 
-def _sampleCheck(node=None):
+def _imageCheck(node=None):
+    result = TestResult(TestResult.RunningFlag)
+    result.setNext(node)
+    return result
+
+
+def _textsCheck(node=None):
+    result = TestResult(TestResult.RunningFlag)
+    result.setNext(node)
+    return result
+
+
+def _imagesCheck(node=None):
     result = TestResult(TestResult.RunningFlag)
     result.setNext(node)
     return result

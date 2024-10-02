@@ -27,7 +27,7 @@ class TestCase(TestBase):
         if _checkActionList(self._header, self._actionHash):
             current = self._header
             TestRuntime.isRunning = True
-            TestRuntime.currResult = None  # TODO
+            TestRuntime.currentResult = None  # TODO
 
             while current in self._actionHash:
                 action = self._actionHash[current]
@@ -39,28 +39,28 @@ class TestCase(TestBase):
 
                 while True:
                     flag = False
-                    if result.getStatus() == TestResult.NoneFlag:
+                    if result.getFlags() == TestResult.NoneFlag:
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                         # 发出运行错误信号
                         return False
-                    if result.getStatus() & TestResult.CriticalFlag:
+                    if result.getFlags() & TestResult.CriticalFlag:
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, '致命错误'))
                         return False
-                    if result.getStatus() & TestResult.FailedFlag:
+                    if result.getFlags() & TestResult.FailedFlag:
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, '测试失败'))
                         return True
-                    if result.getStatus() & TestResult.FinishedFlag:
+                    if result.getFlags() & TestResult.FinishedFlag:
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, '测试完成'))
                         return True
-                    if result.getStatus() & TestResult.ErrorFlag:
+                    if result.getFlags() & TestResult.ErrorFlag:
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, '运行错误'))
                         flag = True
-                    if result.getStatus() & TestResult.WaitingFlag:
+                    if result.getFlags() & TestResult.WaitingFlag:
                         TestRuntime.isWaiting = True
                         TestRuntime.isRunning = False
                         self.statusChanged.emit(_packInfo1(result, action, '输入数据'))
@@ -80,7 +80,7 @@ class TestCase(TestBase):
                                 self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                                 return False
                         flag = True
-                    if result.getStatus() & TestResult.RunningFlag:
+                    if result.getFlags() & TestResult.RunningFlag:
                         self.statusChanged.emit(_packInfo1(result, action, '正在运行'))
                         break
                     if not flag:
@@ -88,8 +88,8 @@ class TestCase(TestBase):
                         self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
                         return False
 
-                TestRuntime.currResult = result
-                TestRuntime.bufferResult[action.getIden()] = result
+                TestRuntime.currentResult = result
+                TestRuntime.historyResult[action.getIden()] = result
                 time.sleep(action.getDelay() / 1000)
                 current = result.getNext()
                 success = True
@@ -130,7 +130,7 @@ def _checkActionList(header, actions):
 
 def _packInfo1(flag, iden=None, msg=None):
     if isinstance(flag, TestResult):
-        flag = flag.getStatus()
+        flag = flag.getFlags()
     if isinstance(iden, TestAction):
         iden = iden.getIden()
     return {'flag': flag, 'iden': iden, 'msg': msg}

@@ -1,12 +1,9 @@
-
-
-
 {
 	"type": "group",
 	"iden": "UUID",
 	"name": "测试TransmitPage",
 	"desc": "测试TransmitPage的测试组",
-	
+
 	"cases": [
 		{
 			"type": "case",
@@ -15,21 +12,27 @@
 			"desc": "创建一个ETH报文的测试用例",
 
 			"start": "UUID",
+			"active": true,
 			"actions": [
 				{
 					"type": "check",
 					"iden": "UUID",
 					"name": "打开菜单",
 					"desc": ".......",
-					
-					"class": "simple(简单检查)|sample(采样检查)",
+
+					"class": "text(文字检查)|image(图片检查)|texts(文字采样检查)|images(图片采样检查)",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						// 通用数据: 图片列表
-						// 普通检查的数据: 无
-						// 采样检查的数据: 时长 总次数 命中次数
+						"rect": {"top": "last:topCenter", "left":  "uuid:UUID.topLeft", "right": "user:{10,10}", "bottom": null},
+						"offset": {"top": 0, "left":  0, "right": 0, "bottom": 0},
+						"source": "shot:null|last:null|uuid:UUID",
+						"targets": ["file:图片1", "file:图片2"],
+
+						"hit": 10,
+						"count": 10,
+						"duration": 5000
 					}
 				},
 				{
@@ -37,23 +40,19 @@
 					"iden": "UUID",
 					"name": "点击菜单",
 					"desc": ".......",
-					
+
 					"class": "click(点击)|leftClick(左击)|rightClick(右击)|doubleClick(双击)|move(鼠标移动)|drag(鼠标拖动)|wheel(滚动)|key(按键)|keys(组合键)|copyTo(复制到)",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						// 通用数据:
-						// 点击: 点击坐标
-						// 双击: 点击坐标
-						// 左击: 点击坐标 持续时间
-						// 右击: 点击坐标 持续时间
-						// 移动: 目的坐标 持续时间
-						// 拖动: 目的坐标 持续时间
-						// 滚动: 滚动坐标 滚动单位
-						// 按键: 按键值 持续时间
-						// 组合键: 组合键值
-						// 复制到: 复制内容 粘贴位置
+						"point": "last:center|uuid:UUID.topRight|user:{0,0}",
+						"offset": {"x": 0, "y": 0},
+
+						"time": 10,
+						"keys": ["Ctrl", "A"],
+						"roll": 10,
+						"content": "buff:null|buff:clear|user:粘贴内容"
 					}
 				},
 				{
@@ -67,8 +66,9 @@
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						"true": "UUID",
-						"false": "UUID",
+						"fork": {"goto": "UUID", "exec": "Lambda"},
+						"input": {"form": "None|text","tips": "输入提示"},
+						"script": {"path": "脚本路径", "args": "脚本参数"}
 					}
 				},
 				{
@@ -77,12 +77,13 @@
 					"name": "空节点",
 					"desc": "空白节点",
 
-					"class": "none",
+					"class": "empty",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",
-					"config": {}
-				},
+					"config": {
+					}
+				}
 			]
 		}
 	]

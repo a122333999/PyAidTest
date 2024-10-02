@@ -19,7 +19,7 @@
 					"name": "打开菜单",
 					"desc": ".......",
 					
-					"class": "simple",
+					"class": "image",
 					"delay": 1000,
 					"retry": 0,
 					"child": "9a0fff5c-3d29-4eba-acae-29f2bf4b52c3",

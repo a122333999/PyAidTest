@@ -31,11 +31,12 @@ class TestResult:
     ErrorFlag = 0x10
     CriticalFlag = 0x20
 
-    def __init__(self, status=NoneFlag):
+    def __init__(self, flags=NoneFlag):
         super().__init__()
         self._next = None
+        self._flags = int(flags)
         self._rects = list()
-        self._status = int(status)
+        self._images = list()
         self._callback = None
         # 错误信息
 
@@ -55,8 +56,8 @@ class TestResult:
     def setNext(self, uuid):
         self._next = uuid
 
-    def getStatus(self):
-        return self._status
+    def getFlags(self):
+        return self._flags
 
     def setCallback(self, callback):
         self._callback = callback

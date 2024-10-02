@@ -40,7 +40,7 @@ class TestFactory:
             return result
 
     @staticmethod
-    def formatGroup():
+    def formatGroup(group: TestGroup, only=True):
         pass
 
     @staticmethod
@@ -62,7 +62,7 @@ class TestFactory:
             return result
 
     @staticmethod
-    def formatCase():
+    def formatCase(case: TestCase, only=True):
         pass
 
     @staticmethod
@@ -90,7 +90,7 @@ class TestFactory:
         return result
 
     @staticmethod
-    def formatAction():
+    def formatAction(action: TestAction, only=True):
         pass
 
 

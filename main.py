@@ -1,6 +1,7 @@
 import sys
 import uuid
-
+import pyscreeze
+import pyautogui
 from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication
 from ExecuteModule.Execute import Execute
@@ -15,6 +16,8 @@ def testSlot(path):
 if __name__ == '__main__':
     execute = Execute()
     execute.execSignal.connect(testSlot)
+
+    print(pyautogui.locateOnScreen('./Docs/testimg1.png'))
 
     ret = execute.load("./Docs/test1.json")
     print(ret)

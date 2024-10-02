@@ -7,6 +7,7 @@ from ExecuteModule.TestRuntime import TestRuntime
 
 
 # TODO: 模块重入限制
+# 说明: 测试组里的测试用例是有序的
 
 """ 状态 """
 StoppedStatus = 0
@@ -46,7 +47,7 @@ class Execute(QtCore.QObject):
     def startAll(self, handle):  # 启动整个组
         if not TestRuntime.isRunning and not TestRuntime.isWaiting and not TestRuntime.isStopping:
             if search := _findGroup(self._handleList, handle):
-                TestRuntime.currHandle = handle
+                TestRuntime.currentHandle = handle
                 for case in search.getCaseList():
                     ret = self._start(handle, case.getIden())
                     if ret is False:
@@ -161,7 +162,7 @@ class Execute(QtCore.QObject):
             'status': status,
             'schedule': schedule,
             'iden': data.get('iden', None),
-            'msgs': data.get('message', None),
+            'msgs': data.get('msg', None),
             'error': None
         })
 
@@ -169,7 +170,7 @@ class Execute(QtCore.QObject):
         if not TestRuntime.isRunning and not TestRuntime.isWaiting and not TestRuntime.isStopping:
             if search := _findCase(self._handleList, handle, case):
                 TestRuntime.clear()
-                TestRuntime.currHandle = handle
+                TestRuntime.currentHandle = handle
                 search.statusChanged.connect(self.onCaseStatusChanged)
                 search.start()
                 search.statusChanged.disconnect(self.onCaseStatusChanged)
