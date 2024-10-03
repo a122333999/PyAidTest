@@ -11,7 +11,8 @@
 			"name": "创建ETH报文1",
 			"desc": "创建一个ETH报文的测试用例",
 
-			"header": "741ee909-d55c-45b5-8516-20ed160479cc",
+			"start": "741ee909-d55c-45b5-8516-20ed160479cc",
+			"active": true,
 			"actions": [
 				{
 					"type": "check",

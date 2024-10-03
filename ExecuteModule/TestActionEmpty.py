@@ -12,12 +12,8 @@ class TestActionEmpty(TestAction):
         self.setName("TestEmpty")
         self.setDesc("This TestEmpty")
 
-    def start(self):
-        print("start empty", self.getName(), self.getIden())
+    def exec(self):
         return _noneEmpty(self.getChild())
-
-    def stop(self):
-        print("stop empty", self.getName(), self.getIden())
 
 
 def _noneEmpty(node=None):

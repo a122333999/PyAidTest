@@ -13,10 +13,7 @@ class TestAction(TestBase):
         self._retry = 0
         self._child = None
 
-    def start(self) -> TestResult:
-        pass
-
-    def stop(self):
+    def exec(self) -> TestResult:
         pass
 
     def setClass(self, data):

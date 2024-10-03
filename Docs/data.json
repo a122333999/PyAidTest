@@ -27,7 +27,7 @@
 					"config": {
 						"rect": {"top": "last:topCenter", "left":  "uuid:UUID.topLeft", "right": "user:{10,10}", "bottom": null},
 						"offset": {"top": 0, "left":  0, "right": 0, "bottom": 0},
-						"source": "shot:null|last:null|uuid:UUID",
+						"source": "shot:none|last:none|uuid:UUID",
 						"targets": ["file:图片1", "file:图片2"],
 
 						"hit": 10,
@@ -52,7 +52,7 @@
 						"time": 10,
 						"keys": ["Ctrl", "A"],
 						"roll": 10,
-						"content": "buff:null|buff:clear|user:粘贴内容"
+						"content": "buff:none|buff:clear|user:粘贴内容"
 					}
 				},
 				{

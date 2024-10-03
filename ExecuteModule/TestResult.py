@@ -1,4 +1,3 @@
-from enum import Enum
 
 
 class TestResult:
@@ -74,29 +73,3 @@ class TestResult:
     def getRectInfo(self, index):
         return self._rects[index]
 
-    def getCenterPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getTopCenterPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getTopRightPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getTopLeftPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getBottomCenterPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getBottomRightPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getBottomLeftPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getRightCenterPoint(self, index=0, offset=(0, 0)):
-        pass
-
-    def getLeftCenterPoint(self, index=0, offset=(0, 0)):
-        pass

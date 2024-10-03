@@ -26,6 +26,8 @@ TestError = 5
 class Execute(QtCore.QObject):
     # 执行信号 1句柄 2{用例:动作}
     execSignal = QtCore.Signal(dict)
+    # 新的记录被添加 1记录的key
+    recordAdded = QtCore.Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -168,11 +170,12 @@ class Execute(QtCore.QObject):
 
     def _start(self, handle, case: int | UUID):  # 启动指定用例
         if not TestRuntime.isRunning and not TestRuntime.isWaiting and not TestRuntime.isStopping:
-            if search := _findCase(self._handleList, handle, case):
+            search = _findCase(self._handleList, handle, case)
+            if search and search.getActive():
                 TestRuntime.clear()
                 TestRuntime.currentHandle = handle
                 search.statusChanged.connect(self.onCaseStatusChanged)
-                search.start()
+                search.exec()
                 search.statusChanged.disconnect(self.onCaseStatusChanged)
                 TestRuntime.clear()
                 return True

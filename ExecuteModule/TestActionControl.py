@@ -2,6 +2,11 @@ from ExecuteModule.TestAction import TestAction
 from ExecuteModule.TestResult import TestResult
 
 
+_defaultFork = {"goto": None, "exec": ""}
+_defaultInput = {"form": "none", "tips": "请选择下一步动作:"}
+_defaultScript = {"path": "", "args": ""}
+
+
 class TestActionControl(TestAction):
 
     _type = "control"
@@ -10,13 +15,15 @@ class TestActionControl(TestAction):
         super().__init__()
         self.setName("TestControl")
         self.setDesc("This TestControl")
+        self._configFork = _defaultFork
+        self._configInput = _defaultInput
+        self._configScript = _defaultScript
 
-    def start(self):
-        print("start control", self.getName(), self.getIden())
+    def exec(self):
         if self.getClass() == 'fork':
             return _forkControl(self.getChild())
-        elif self.getClass() == 'pause':
-            return _pauseControl(self.getChild())
+        elif self.getClass() == 'input':
+            return _inputControl(self.getChild())
         elif self.getClass() == 'finished':
             return _finishedControl(self.getChild())
         elif self.getClass() == 'failed':
@@ -26,8 +33,38 @@ class TestActionControl(TestAction):
         else:
             return TestResult()
 
-    def stop(self):
-        print("stop control", self.getName(), self.getIden())
+    def setConfig(self, data):
+        self._configFork = _returnConfigsValue('fork', data)
+        self._configInput = _returnConfigsValue('input', data)
+        self._configScript = _returnConfigsValue('script', data)
+
+    def getConfig(self):
+        return {
+            "fork": self._configFork,
+            "input": self._configInput,
+            "script": self._configScript,
+        }
+
+
+def _returnConfigsValue(key: str, data: dict):
+    ret = None
+    if key == 'fork':
+        ret = _defaultFork
+        val = data.get(key, ret)
+        if isinstance(val, dict):
+            ret = val
+    elif key == 'input':
+        ret = _defaultInput
+        val = data.get(key, ret)
+        if isinstance(val, dict):
+            ret = val
+    elif key == 'script':
+        ret = _defaultScript
+        val = data.get(key, ret)
+        if isinstance(val, dict):
+            ret = val
+
+    return ret
 
 
 

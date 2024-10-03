@@ -30,18 +30,28 @@ class TestFactory:
             result.setName(data['name'])
             result.setIden(data['iden'])
             result.setDesc(data['desc'])
-            if only is False:
-                cases: list = data.get('cases', list())
-                for item in cases:
-                    case = TestFactory.parseCase(item, False)
-                    if isinstance(case, TestCase):
+
+            if not only:
+                for item in data.get('cases', list()):
+                    if case := TestFactory.parseCase(item, False):
                         result.addCaseItem(case)
 
             return result
 
     @staticmethod
     def formatGroup(group: TestGroup, only=True):
-        pass
+        cases = list()
+        if not only:
+            for item in group.getCaseList():
+                cases.append(TestFactory.formatCase(item, only))
+
+        return {
+            'type': group.getType(),
+            'name': group.getName(),
+            'iden': group.getIden(),
+            'desc': group.getDesc(),
+            'cases': cases,
+        }
 
     @staticmethod
     def parseCase(data: dict, only=False):
@@ -50,34 +60,38 @@ class TestFactory:
             result.setName(data['name'])
             result.setIden(data['iden'])
             result.setDesc(data['desc'])
-            result.setHeader(data['header'])
-            if only is False:
-                actions: list = data.get('actions', list())
-                for item in actions:
-                    action = TestFactory.parseAction(item)
-                    if isinstance(action, TestAction):
+            result.setStart(data['start'])
+            result.setActive(data['active'])
+
+            if not only:
+                for item in data.get('actions', list()):
+                    if action := TestFactory.parseAction(item):
                         result.addActionItem(action)
-                if result.checkActionList() is False:
+                if not result.checkActionList():
                     return None
+
             return result
 
     @staticmethod
     def formatCase(case: TestCase, only=True):
-        pass
+        actions = list()
+        if not only:
+            for item in case.getActionList():
+                actions.append(TestFactory.formatAction(item, only))
+
+        return {
+            'type': case.getType(),
+            'name': case.getName(),
+            'iden': case.getIden(),
+            'desc': case.getDesc(),
+            'start': case.getStart(),
+            'active': case.getActive(),
+            'actions': actions,
+        }
 
     @staticmethod
     def parseAction(data: dict):
-        result: TestAction | None = None
-        if data['type'] == TestActionCheck.getType():
-            result = TestActionCheck()
-        elif data['type'] == TestActionOperate.getType():
-            result = TestActionOperate()
-        elif data['type'] == TestActionControl.getType():
-            result = TestActionControl()
-        elif data['type'] == TestActionEmpty.getType():
-            result = TestActionEmpty()
-
-        if result is not None:
+        if result := _createTestAction(data):
             result.setName(data['name'])
             result.setIden(data['iden'])
             result.setDesc(data['desc'])
@@ -86,12 +100,21 @@ class TestFactory:
             result.setRetry(data['retry'])
             result.setChild(data['child'])
             result.setConfig(data['config'])
-
-        return result
+            return result
 
     @staticmethod
     def formatAction(action: TestAction, only=True):
-        pass
+        return {
+            'type': action.getType(),
+            'name': action.getName(),
+            'iden': action.getIden(),
+            'desc': action.getDesc(),
+            'class': action.getClass(),
+            'delay': action.getDelay(),
+            'retry': action.getRetry(),
+            'child': action.getChild(),
+            'config': action.getConfig(),
+        }
 
 
 def _readFile(path):
@@ -100,3 +123,26 @@ def _readFile(path):
             return json.load(fp)
     except Exception as e:
         return e
+
+
+def _createTestAction(data: dict):
+    result = None
+    if data['type'] == TestActionCheck.getType():
+        result = TestActionCheck()
+    elif data['type'] == TestActionOperate.getType():
+        result = TestActionOperate()
+    elif data['type'] == TestActionControl.getType():
+        result = TestActionControl()
+    elif data['type'] == TestActionEmpty.getType():
+        result = TestActionEmpty()
+    return result
+
+
+
+
+
+
+
+
+
+

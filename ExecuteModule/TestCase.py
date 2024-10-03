@@ -18,20 +18,21 @@ class TestCase(TestBase):
         super().__init__()
         self.setName("TestCase")
         self.setDesc("This TestCase")
-        self._header = None
+        self._start = None
+        self._active = True
         self._actionList = list()
         self._actionHash = dict()
 
-    def start(self):
+    def exec(self):
         success = False
-        if _checkActionList(self._header, self._actionHash):
-            current = self._header
+        if _checkActionList(self._start, self._actionHash) and self._active:
+            current = self._start
             TestRuntime.isRunning = True
             TestRuntime.currentResult = None  # TODO
 
             while current in self._actionHash:
                 action = self._actionHash[current]
-                result = action.start()
+                result = action.exec()
                 if TestRuntime.isStopping:
                     TestRuntime.clear()
                     self.statusChanged.emit(_packInfo1(result, action, '手动停止'))
@@ -94,16 +95,25 @@ class TestCase(TestBase):
                 current = result.getNext()
                 success = True
 
+        if not self._active:
+            return False
+
         if not success:
             self.statusChanged.emit(_packInfo1(TestResult, None, '流程异常'))
             return False
 
-    def setHeader(self, header):
-        if ret := CommonUtils.checkUuid(header):
-            self._header = ret
+    def setStart(self, start):
+        if ret := CommonUtils.checkUuid(start):
+            self._start = ret
 
-    def getHeader(self):
-        return self._header
+    def getStart(self):
+        return self._start
+
+    def setActive(self, active: bool):
+        self._active = active
+
+    def getActive(self):
+        return self._active
 
     def addActionItem(self, action):
         if isinstance(action, TestAction):
@@ -117,7 +127,7 @@ class TestCase(TestBase):
         return self._actionList
 
     def checkActionList(self):
-        return _checkActionList(self._header, self._actionHash)
+        return _checkActionList(self._start, self._actionHash)
 
 
 def _checkActionList(header, actions):
