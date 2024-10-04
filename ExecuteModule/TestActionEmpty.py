@@ -13,10 +13,14 @@ class TestActionEmpty(TestAction):
         self.setDesc("This TestEmpty")
 
     def exec(self):
-        return _noneEmpty(self.getChild())
+        if self.getClass() == 'empty':
+            return self._empty()
+        return TestResult(TestResult.CriticalFlag, "执行empty错误: 没有找到匹配的class")
+
+    def _empty(self):
+        result = TestResult(TestResult.RunningFlag, "执行empty完成")
+        result.setNext(self.getChild())
+        return result
 
 
-def _noneEmpty(node=None):
-    result = TestResult(TestResult.RunningFlag)
-    result.setNext(node)
-    return result
+

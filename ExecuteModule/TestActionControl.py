@@ -30,8 +30,8 @@ class TestActionControl(TestAction):
             return _failedControl(self.getChild())
         elif self.getClass() == 'script':
             return _scriptControl(self.getChild())
-        else:
-            return TestResult()
+
+        return TestResult(TestResult.CriticalFlag, "没有找到匹配的class")
 
     def setConfig(self, data):
         self._configFork = _returnConfigsValue('fork', data)
@@ -69,31 +69,31 @@ def _returnConfigsValue(key: str, data: dict):
 
 
 def _forkControl(node=None):
-    result = TestResult(TestResult.RunningFlag)
+    result = TestResult(TestResult.RunningFlag, "")
     result.setNext(node)
     return result
 
 
 def _inputControl(node=None):
-    result = TestResult(TestResult.RunningFlag)
+    result = TestResult(TestResult.RunningFlag, "")
     result.setNext(node)
     return result
 
 
 def _finishedControl(node=None):
-    result = TestResult(TestResult.RunningFlag)
+    result = TestResult(TestResult.RunningFlag, "")
     result.setNext(node)
     return result
 
 
 def _failedControl(node=None):
-    result = TestResult(TestResult.RunningFlag)
+    result = TestResult(TestResult.RunningFlag, "")
     result.setNext(node)
     return result
 
 
 def _scriptControl(node=None):
-    result = TestResult(TestResult.RunningFlag)
+    result = TestResult(TestResult.RunningFlag, "")
     result.setNext(node)
     return result
 

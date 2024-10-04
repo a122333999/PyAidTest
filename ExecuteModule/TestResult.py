@@ -30,14 +30,14 @@ class TestResult:
     ErrorFlag = 0x10
     CriticalFlag = 0x20
 
-    def __init__(self, flags=NoneFlag):
+    def __init__(self, flags, msg):
         super().__init__()
         self._next = None
         self._flags = int(flags)
         self._rects = list()
         self._images = list()
+        self._message = msg
         self._callback = None
-        # 错误信息
 
     def isValid(self):
         return bool(len(self._rects))
@@ -57,6 +57,18 @@ class TestResult:
 
     def getFlags(self):
         return self._flags
+
+    def addImage(self, image):
+        self._images.append(image)
+
+    def getImages(self):
+        return self._images
+
+    def setMessage(self, msg):
+        self._message = msg
+
+    def getMessage(self):
+        return self._message
 
     def setCallback(self, callback):
         self._callback = callback

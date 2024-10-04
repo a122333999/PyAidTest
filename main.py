@@ -1,4 +1,5 @@
 import sys
+import time
 import uuid
 import pyscreeze
 import pyautogui
@@ -35,8 +36,6 @@ if __name__ == '__main__':
     execute.start(ret, 0)
     # execute.start(ret, 0)
     # execute.startAll(ret)
-
-
 
     app = QApplication(sys.argv)
     window = MainWindow()

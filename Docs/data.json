@@ -25,7 +25,7 @@
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						"rect": {"top": "last:topCenter", "left":  "uuid:UUID.topLeft", "right": "user:{10,10}", "bottom": null},
+						"rect": {"top": "last:topCenter", "left":  "uuid:UUID.topLeft", "right": "user:(10,10)", "bottom": null},
 						"offset": {"top": 0, "left":  0, "right": 0, "bottom": 0},
 						"source": "shot:none|last:none|uuid:UUID",
 						"targets": ["file:图片1", "file:图片2"],
@@ -41,12 +41,12 @@
 					"name": "点击菜单",
 					"desc": ".......",
 
-					"class": "click(点击)|leftClick(左击)|rightClick(右击)|doubleClick(双击)|move(鼠标移动)|drag(鼠标拖动)|wheel(滚动)|key(按键)|keys(组合键)|copyTo(复制到)",
+					"class": "click(点击)|leftClick(左击)|rightClick(右击)|doubleClick(双击)|move(鼠标移动)|drag(鼠标拖动)|wheel(滚动)|key(按键)|keys(组合键)|copyPaste(复制粘贴)",
 					"delay": 1000,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						"point": "last:center|uuid:UUID.topRight|user:{0,0}",
+						"point": "last:center|uuid:UUID.topRight|user:(16,16)",
 						"offset": {"x": 0, "y": 0},
 
 						"time": 10,

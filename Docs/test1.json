@@ -38,12 +38,18 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "click",
+					"class": "copyPaste",
 					"delay": 1000,
 					"retry": 0,
 					"child": "0fe433e2-f488-465c-aa06-9411e0490a3a",
 					"config": {
+						"point": "user:(0, 0)",
+						"offset": {"x": 1000, "y": 600},
 
+						"time": -1,
+						"keys": ["Ctrl", "A"],
+						"roll": 10,
+						"content": "user:AAABBB"
 					}
 				},
 				{

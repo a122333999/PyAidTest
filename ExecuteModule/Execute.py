@@ -1,3 +1,4 @@
+import pyautogui
 from uuid import UUID
 from PySide6 import QtCore
 from ExecuteModule.TestGroup import TestGroup
@@ -21,6 +22,9 @@ TestFinished = 2
 TestNext = 3
 TestInput = 4
 TestError = 5
+
+""" 初始化pyautogui设置"""
+pyautogui.FAILSAFE = False
 
 
 class Execute(QtCore.QObject):

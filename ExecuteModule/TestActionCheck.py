@@ -42,7 +42,7 @@ class TestActionCheck(TestAction):
         elif self.getClass() == 'images':
             return self._imagesCheck()
 
-        return TestResult(TestResult.CriticalFlag)
+        return TestResult(TestResult.CriticalFlag, "没有找到匹配的class")
 
     def setConfig(self, data):
         self._configRect = _returnConfigsValue('rect', data)
@@ -87,18 +87,18 @@ class TestActionCheck(TestAction):
 
         # rects = _toAbsRects(rects)
 
-        result = TestResult(TestResult.RunningFlag)
+        result = TestResult(TestResult.RunningFlag, "")
         result.setNext(self.getChild())
         # result.set
         return result
 
     def _textsCheck(self):
-        result = TestResult(TestResult.CriticalFlag)
+        result = TestResult(TestResult.CriticalFlag, "")
         result.setNext(self.getChild())
         return result
 
     def _imagesCheck(self):
-        result = TestResult(TestResult.CriticalFlag)
+        result = TestResult(TestResult.CriticalFlag, "")
         result.setNext(self.getChild())
         return result
 

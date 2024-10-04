@@ -33,56 +33,52 @@ class TestCase(TestBase):
             while current in self._actionHash:
                 action = self._actionHash[current]
                 result = action.exec()
-                if TestRuntime.isStopping:
-                    TestRuntime.clear()
-                    self.statusChanged.emit(_packInfo1(result, action, '手动停止'))
-                    return True
 
                 while True:
                     flag = False
                     if result.getFlags() == TestResult.NoneFlag:
                         TestRuntime.clear()
-                        self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         # 发出运行错误信号
                         return False
                     if result.getFlags() & TestResult.CriticalFlag:
                         TestRuntime.clear()
-                        self.statusChanged.emit(_packInfo1(result, action, '致命错误'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         return False
                     if result.getFlags() & TestResult.FailedFlag:
                         TestRuntime.clear()
-                        self.statusChanged.emit(_packInfo1(result, action, '测试失败'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         return True
                     if result.getFlags() & TestResult.FinishedFlag:
                         TestRuntime.clear()
-                        self.statusChanged.emit(_packInfo1(result, action, '测试完成'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         return True
                     if result.getFlags() & TestResult.ErrorFlag:
                         TestRuntime.clear()
-                        self.statusChanged.emit(_packInfo1(result, action, '运行错误'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         flag = True
                     if result.getFlags() & TestResult.WaitingFlag:
                         TestRuntime.isWaiting = True
                         TestRuntime.isRunning = False
-                        self.statusChanged.emit(_packInfo1(result, action, '输入数据'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         while True:
                             if TestRuntime.isRunning:
                                 result = result.callback(TestRuntime.inputData)
                                 break
                             elif TestRuntime.isStopping:
                                 TestRuntime.clear()
-                                self.statusChanged.emit(_packInfo1(result, action, '手动停止'))
+                                self.statusChanged.emit(_packInfo1(TestResult.NoneFlag, None, '外部停止'))
                                 return True
                             elif TestRuntime.isWaiting:
                                 time.sleep(0.1)
                                 time.sleep(0.1)
                             else:
                                 TestRuntime.clear()
-                                self.statusChanged.emit(_packInfo1(result, action, '未知错误'))
+                                self.statusChanged.emit(_packInfo1(TestResult.CriticalFlag, None, '未知错误'))
                                 return False
                         flag = True
                     if result.getFlags() & TestResult.RunningFlag:
-                        self.statusChanged.emit(_packInfo1(result, action, '正在运行'))
+                        self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         break
                     if not flag:
                         TestRuntime.clear()
@@ -91,15 +87,21 @@ class TestCase(TestBase):
 
                 TestRuntime.currentResult = result
                 TestRuntime.historyResult[action.getIden()] = result
+                if TestRuntime.isStopping:
+                    TestRuntime.clear()
+                    self.statusChanged.emit(_packInfo1(TestResult.NoneFlag, None, '外部停止'))
+                    return True
+
                 time.sleep(action.getDelay() / 1000)
                 current = result.getNext()
                 success = True
 
         if not self._active:
+            self.statusChanged.emit(_packInfo1(TestResult.CriticalFlag, None, '测试用例未激活'))
             return False
 
         if not success:
-            self.statusChanged.emit(_packInfo1(TestResult, None, '流程异常'))
+            self.statusChanged.emit(_packInfo1(TestResult.CriticalFlag, None, '测试流程异常'))
             return False
 
     def setStart(self, start):
