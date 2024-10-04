@@ -35,6 +35,19 @@ class TestInterpret:
         return None
 
     @classmethod
+    def fn3(cls, content: str):
+        fun = None
+        ret = None
+        if "last" in content:
+            ret = TestRuntime.currentResult
+            fun = _extractLambda(content[5:])
+        elif "uuid:" in content:
+            ret = TestRuntime.historyResult.get(_extractUuid(content[5:]), None)
+            fun = _extractLambda(content[content.find(".")+1:])
+
+        return fun, ret
+
+    @classmethod
     def _fn100(cls, content: str, ret: TestResult, idx=0, offset=(0, 0)):
         if idx < ret.getRectSize():
             rect = ret.getRectList()[idx]
@@ -77,5 +90,24 @@ def _extractPoint(data: str):
 
 def _extractUuid(data: str):
     idx = data.find(".")
-    return CommonUtils.checkUuid(data[:idx])
+    if CommonUtils.checkUuid(data[:idx]):
+        return data[:idx]
+    return None
+
+
+def _extractLambda(data: str):
+    try:
+        code = "lambda rects: " + data
+        exp = eval(code)
+        exp([])
+        return exp
+    except NameError:
+        return None
+    except IndexError:
+        return None
+    except SyntaxError:
+        return None
+    except:
+        return None
+
 

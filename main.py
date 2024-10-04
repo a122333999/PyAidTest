@@ -11,9 +11,13 @@ from WidgetModule.Window import MainWindow
 from ExecuteModule.TestRect import TestRect
 
 
+handle = None
+execute = None
+
+
 @QtCore.Slot(dict)
-def testSlot(path):
-    print(path)
+def testSlot(info: dict):
+    print(info)
 
 
 if __name__ == '__main__':
@@ -22,8 +26,8 @@ if __name__ == '__main__':
 
     print(pyautogui.locateOnScreen('./Docs/testimg1.png'))
 
-    ret = execute.load("./Docs/test1.json")
-    print(ret)
+    handle = execute.load("./Docs/test1.json")
+    print(handle)
     # print(execute.getHandleList())
     # print(execute.getHandleInfo(ret))
     # print(execute.getCaseList(ret))
@@ -33,13 +37,14 @@ if __name__ == '__main__':
     # print(execute.getActionInfo(ret, 0, uuid.UUID('741ee909-d55c-45b5-8516-20ed160479cc')))
     # print(execute.getActionInfo(ret, 0, uuid.UUID('9a0fff5c-3d29-4eba-acae-29f2bf4b52c3')))
 
-    execute.start(ret, 0)
-    # execute.start(ret, 0)
-    # execute.startAll(ret)
+    execute.start(handle, 0)
+    # execute.start(handle, 0)
+    # execute.startAll(handle)
 
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
 
 

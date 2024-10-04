@@ -26,8 +26,8 @@ class TestAction(TestBase):
         self._retry = data
 
     def setChild(self, child):
-        if ret := CommonUtils.checkUuid(child):
-            self._child = ret
+        if CommonUtils.checkUuid(child):
+            self._child = child
 
     def setConfig(self, data):
         pass

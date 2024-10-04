@@ -57,7 +57,7 @@ class TestCase(TestBase):
                         TestRuntime.clear()
                         self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
                         flag = True
-                    if result.getFlags() & TestResult.WaitingFlag:
+                    if result.getFlags() & TestResult.InputtingFlag:
                         TestRuntime.isWaiting = True
                         TestRuntime.isRunning = False
                         self.statusChanged.emit(_packInfo1(result, action, result.getMessage()))
@@ -105,8 +105,8 @@ class TestCase(TestBase):
             return False
 
     def setStart(self, start):
-        if ret := CommonUtils.checkUuid(start):
-            self._start = ret
+        if CommonUtils.checkUuid(start):
+            self._start = start
 
     def getStart(self):
         return self._start
@@ -134,10 +134,10 @@ class TestCase(TestBase):
 
 def _checkActionList(header, actions):
     # TODO: 叶子节点是控制节点
-    if CommonUtils.checkUuid(header) is not None:
-        if header not in actions.keys():
-            return False
-    return True
+    if CommonUtils.checkUuid(header):
+        if header in actions.keys():
+            return True
+    return False
 
 
 def _packInfo1(flag, iden=None, msg=None):

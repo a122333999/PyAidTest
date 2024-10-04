@@ -6,14 +6,14 @@ class CommonUtils:
     def checkUuid(data: str | UUID):
         if isinstance(data, UUID):
             if data.version == 4:
-                return data
+                return True
         if isinstance(data, str):
             try:
-                temp = UUID(data)
-                if temp.version == 4:
-                    return temp
+                if UUID(data).version == 4:
+                    return True
             except ValueError:
-                return None
+                pass
 
+        return False
 
 

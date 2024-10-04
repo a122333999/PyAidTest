@@ -42,7 +42,7 @@ class TestActionCheck(TestAction):
         elif self.getClass() == 'images':
             return self._imagesCheck()
 
-        return TestResult(TestResult.CriticalFlag, "没有找到匹配的class")
+        return TestResult(TestResult.CriticalFlag, "执行check错误: 没有找到匹配的class")
 
     def setConfig(self, data):
         self._configRect = _returnConfigsValue('rect', data)

@@ -38,13 +38,13 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "copyPaste",
+					"class": "move",
 					"delay": 1000,
 					"retry": 0,
 					"child": "0fe433e2-f488-465c-aa06-9411e0490a3a",
 					"config": {
-						"point": "user:(0, 0)",
-						"offset": {"x": 1000, "y": 600},
+						"point": "user:(16, 16)",
+						"offset": {"x": 0, "y": 0},
 
 						"time": -1,
 						"keys": ["Ctrl", "A"],
@@ -62,7 +62,9 @@
 					"delay": 1000,
 					"retry": 0,
 					"child": "7749684f-7ddf-4d8f-85c1-614d890c5165",
-					"config": { }
+					"config": {
+						"fork": {"goto": null, "eval": "uuid:9a0fff5c-3d29-4eba-acae-29f2bf4b52c3.rects[99]"}
+					}
 				},
 				{
 					"type": "empty",
@@ -70,7 +72,7 @@
 					"name": "空节点",
 					"desc": "空白节点",
 
-					"class": "",
+					"class": "empty",
 					"delay": 1000,
 					"retry": 0,
 					"child": null,

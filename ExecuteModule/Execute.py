@@ -5,6 +5,7 @@ from ExecuteModule.TestGroup import TestGroup
 from ExecuteModule.TestResult import TestResult
 from ExecuteModule.TestFactory import TestFactory
 from ExecuteModule.TestRuntime import TestRuntime
+from ExecuteModule.TestInput import TestInput as Input
 
 
 # TODO: 模块重入限制
@@ -16,12 +17,12 @@ RunningStatus = 1
 WaitingStatus = 2
 
 """ 流程 """
-TestNone = 0
-TestFailed = 1
-TestFinished = 2
-TestNext = 3
-TestInput = 4
-TestError = 5
+Test1None = 0
+Test1Failed = 1
+Test1Finished = 2
+Test1Next = 3
+Test1Input = 4
+Test1Error = 5
 
 """ 初始化pyautogui设置"""
 pyautogui.FAILSAFE = False
@@ -32,6 +33,8 @@ class Execute(QtCore.QObject):
     execSignal = QtCore.Signal(dict)
     # 新的记录被添加 1记录的key
     recordAdded = QtCore.Signal(str)
+
+    Input = Input
 
     def __init__(self):
         super().__init__()
@@ -67,7 +70,7 @@ class Execute(QtCore.QObject):
                 TestRuntime.isWaiting = False
                 TestRuntime.isStopping = True
 
-    def input(self, handle, data):
+    def input(self, handle, data: Input):
         if handle in self._handleList.keys():
             if TestRuntime.isWaiting:
                 TestRuntime.inputData = data
@@ -148,21 +151,21 @@ class Execute(QtCore.QObject):
 
     @QtCore.Slot(dict)
     def onCaseStatusChanged(self, data):
-        status, schedule = StoppedStatus, TestNone
+        status, schedule = StoppedStatus, Test1None
         if data.get('flag') == TestResult.NoneFlag:
-            status, schedule = StoppedStatus, TestNone
+            status, schedule = StoppedStatus, Test1None
         elif data.get('flag') == TestResult.FailedFlag:
-            status, schedule = StoppedStatus, TestFailed
+            status, schedule = StoppedStatus, Test1Failed
         elif data.get('flag') == TestResult.FinishedFlag:
-            status, schedule = StoppedStatus, TestFinished
+            status, schedule = StoppedStatus, Test1Finished
         elif data.get('flag') == TestResult.CriticalFlag:
-            status, schedule = StoppedStatus, TestError
+            status, schedule = StoppedStatus, Test1Error
         elif data.get('flag') == TestResult.RunningFlag:
-            status, schedule = RunningStatus, TestNext
+            status, schedule = RunningStatus, Test1Next
         elif data.get('flag') == TestResult.ErrorFlag:
-            status, schedule = RunningStatus, TestError
-        elif data.get('flag') == TestResult.WaitingFlag:
-            status, schedule = WaitingStatus, TestInput
+            status, schedule = RunningStatus, Test1Error
+        elif data.get('flag') == TestResult.InputtingFlag:
+            status, schedule = WaitingStatus, Test1Input
 
         self.execSignal.emit({
             'status': status,

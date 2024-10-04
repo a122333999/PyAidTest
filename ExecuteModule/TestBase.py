@@ -14,10 +14,8 @@ class TestBase(QObject):
         self._desc = "This BaseTest"
 
     def setIden(self, iden):
-        if ret := CommonUtils.checkUuid(iden):
-            self._iden = ret
-        else:
-            raise TypeError("设置的的UUID不被支持", iden)
+        if CommonUtils.checkUuid(iden):
+            self._iden = iden
 
     def setName(self, name):
         self._name = name

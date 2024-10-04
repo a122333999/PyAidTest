@@ -4,5 +4,20 @@
 
 
 class TestInput:
-    def __init__(self):
-        pass
+
+    Continuing = 0
+    Finished = 1
+    Failed = 2
+
+    def __init__(self, behavior=Continuing):
+        self._behavior = int(behavior)
+        self._inputText = None
+
+    def getBehavior(self):
+        return self._behavior
+
+    def setInputText(self, text):
+        self._inputText = text
+
+    def getInputText(self):
+        return self._inputText

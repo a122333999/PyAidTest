@@ -7,7 +7,7 @@
 	"cases": [
 		{
 			"type": "case",
-			"iden": "UUID",
+			"iden": "uuid",
 			"name": "创建ETH报文1",
 			"desc": "创建一个ETH报文的测试用例",
 
@@ -66,8 +66,8 @@
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						"fork": {"goto": "UUID", "exec": "Lambda"},
-						"input": {"form": "None|text","tips": "输入提示"},
+						"fork": {"goto": "UUID", "eval": "last:Lambda|uuid:UUID.Lambda"},
+						"input": {"form": "none|text","tips": "输入提示"},
 						"script": {"path": "脚本路径", "args": "脚本参数"}
 					}
 				},

@@ -26,7 +26,7 @@ class TestResult:
     FinishedFlag = 0x01
     FailedFlag = 0x02
     RunningFlag = 0x04
-    WaitingFlag = 0x08
+    InputtingFlag = 0x08
     ErrorFlag = 0x10
     CriticalFlag = 0x20
 
@@ -42,12 +42,13 @@ class TestResult:
     def isValid(self):
         return bool(len(self._rects))
 
-    def callback(self, *args):
+    def callback(self, data, *args):
         if self._callback:
-            ret = self._callback(self, args)
+            ret = self._callback(self, data, *args)
             if isinstance(ret, TestResult):
                 return ret
-        return TestResult()
+
+        return TestResult(TestResult.CriticalFlag, "回调处理不存在")
 
     def getNext(self):
         return self._next
