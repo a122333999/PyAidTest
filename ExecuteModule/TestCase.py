@@ -24,6 +24,7 @@ class TestCase(TestBase):
         self._actionHash = dict()
 
     def exec(self):
+        # TODO: times未实现 有些Action没实现retry 有些Action没实现把前后截图放到TestResult
         success = False
         if _checkActionList(self._start, self._actionHash) and self._active:
             current = self._start

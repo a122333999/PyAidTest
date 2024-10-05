@@ -66,40 +66,54 @@ class TestActionCheck(TestAction):
 
     def _textCheck(self):
         self.getChild()
-        return TestResult(TestResult.CriticalFlag)
+        return TestResult(TestResult.CriticalFlag, "执行texts错误: 功能未实现")
 
     def _imageCheck(self):
+        # 1截取图片 2限定图片 3搜索子图(重试次数) 4返回结果
+        src = TestInterpret.fn4(self._configSource, pyscreeze.screenshot())
+        box = _limitRegion(src, self._configRect, self._configOffset)
+        cts = _transTargets(self._configTargets, 'img')
+        rects = list()
+        for index in range(self.getRetry() + 1):
+            rects = _searchImages(src, cts, box.toTupleRect())
+            if len(rects):
+                break
 
-        # 1截取图片
-        # 2裁剪图片
-        # 3搜索子图
-        # 4转换绝对坐标
-
-        img1 = pyscreeze.screenshot()
-
-        rect1 = TestRect(0, 0, img1.width, img1.height)
-        rect2 = _qiege(rect1, self._configRect, self._configOffset)
-        img2 = img1.crop((rect2.getXpos(), rect2.getYpos(), rect2.getXpos(), rect2.getYpos()))
-        miss = rect1.miss(rect2)
-
-        # pyscreeze.locateAll("target", "screen")
-        # rects = _searchImages(img2, self._configTargets)
-
-        # rects = _toAbsRects(rects)
-
-        result = TestResult(TestResult.RunningFlag, "")
+        # 没找到目标可以正常返回
+        result = TestResult(TestResult.RunningFlag, "执行image完成")
         result.setNext(self.getChild())
-        # result.set
+        result.setRectsList(rects)
+        result.addImage(src)
+        result.addImage(pyscreeze.screenshot())
         return result
 
     def _textsCheck(self):
-        result = TestResult(TestResult.CriticalFlag, "")
-        result.setNext(self.getChild())
-        return result
+        self.getChild()
+        return TestResult(TestResult.CriticalFlag, "执行texts错误: 功能未实现")
 
     def _imagesCheck(self):
-        result = TestResult(TestResult.CriticalFlag, "")
+        # TODO: duration未实现
+        # 1截取图片 2限定图片 3搜索子图(重试次数) 4返回结果
+        src = TestInterpret.fn4(self._configSource, pyscreeze.screenshot())
+        box = _limitRegion(src, self._configRect, self._configOffset)
+        cts = _transTargets(self._configTargets, 'img')
+        rects, hit = list(), 0
+        for _ in range(self._configCount):
+            for _ in range(self.getRetry() + 1):
+                ret = _searchImages(src, cts, box.toTupleRect())
+                if len(ret):
+                    hit += 1
+                    rects.extend(ret)
+                    break
+            if hit >= self._configHit:
+                break
+
+        result = TestResult(TestResult.RunningFlag, "执行images完成")
         result.setNext(self.getChild())
+        result.addImage(src)
+        result.addImage(pyscreeze.screenshot())
+        if hit >= self._configHit:
+            result.setRectsList(rects)
         return result
 
 
@@ -144,24 +158,43 @@ def _returnConfigsValue(key: str, data: dict):
     return ret
 
 
-def _qiege(rect, limit, offset):
-    result = copy.copy(rect)
+def _limitRegion(img, limit, offset):
+    rect = TestRect(0, 0, img.width, img.height)
 
     if limit["top"]:
-        if topPoint := TestInterpret.fn1(limit["top"]):
-            result.limitTopLine(topPoint)
+        if topPoint := TestInterpret.fn1(limit["top"], (0, offset["top"])):
+            rect.limitTopLine(topPoint)
     if limit["left"]:
-        if leftPoint := TestInterpret.fn1(limit["left"]):
-            result.limitLeftLine(leftPoint)
+        if leftPoint := TestInterpret.fn1(limit["left"], (offset["left"], 0)):
+            rect.limitLeftLine(leftPoint)
     if limit["right"]:
-        if rightPoint := TestInterpret.fn1(limit["right"]):
-            result.limitRightLine(rightPoint)
+        if rightPoint := TestInterpret.fn1(limit["right"], (offset["right"], 0)):
+            rect.limitRightLine(rightPoint)
     if limit["bottom"]:
-        if bottomPoint := TestInterpret.fn1(limit["bottom"]):
-            result.limitBottomLine(bottomPoint)
+        if bottomPoint := TestInterpret.fn1(limit["bottom"], (0, offset["bottom"])):
+            rect.limitBottomLine(bottomPoint)
 
-    return result
+    return rect
 
+
+def _transTargets(targets, only=None):
+    """ only='str'时仅返回text only='img'时仅返回图片 """
+    for target in targets:
+        print(target)
+    return ['./Docs/testimg1.png']
+
+
+def _searchImages(img, targets, region):
+    for target in targets:
+        try:
+            gen = pyscreeze.locateAll(target, img, region=region)
+            rects = [TestRect(box.left, box.top, box.width, box.height) for box in gen]
+            if len(rects):
+                return rects
+        except pyscreeze.ImageNotFoundException:
+            continue
+
+    return []
 
 
 

@@ -92,6 +92,9 @@ class TestRect:
         vp = self._ypos + (self._height // 2)
         return tuple([hp + offset[0], vp + offset[1]])
 
+    def toTupleRect(self):
+        return tuple([self._xpos, self._ypos, self._xpos+self._width, self._ypos+self._height])
+
     def limitTopLine(self, limit: tuple):
         xpos, ypos = _checkLimit(limit)
         differ = ypos - self._ypos  # 差值

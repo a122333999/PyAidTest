@@ -35,17 +35,34 @@ class TestInterpret:
         return None
 
     @classmethod
-    def fn3(cls, content: str):
+    def fn3(cls, content: str, defaultLambda):
         fun = None
         ret = None
         if "last" in content:
             ret = TestRuntime.currentResult
-            fun = _extractLambda(content[5:])
+            fun = _extractLambda(content[5:], defaultLambda)
         elif "uuid:" in content:
             ret = TestRuntime.historyResult.get(_extractUuid(content[5:]), None)
-            fun = _extractLambda(content[content.find(".")+1:])
+            fun = _extractLambda(content[content.find(".")+1:], defaultLambda)
 
         return fun, ret
+
+    @classmethod
+    def fn4(cls, content: str, defaultImage):
+        result = []
+        if "shot:" in content:
+            if defaultImage:
+                result = [defaultImage]
+        elif "last:" in content:
+            if ret := TestRuntime.currentResult:
+                result = ret.getImages()
+        elif "uuid:" in content:
+            if ret := TestRuntime.historyResult.get(_extractUuid(content[5:]), None):
+                result = ret.getImages()
+
+        if len(result):
+            return result[0]
+        return None
 
     @classmethod
     def _fn100(cls, content: str, ret: TestResult, idx=0, offset=(0, 0)):
@@ -95,7 +112,9 @@ def _extractUuid(data: str):
     return None
 
 
-def _extractLambda(data: str):
+def _extractLambda(data: str, defaultLambda):
+    if data == "default":
+        return defaultLambda
     try:
         code = "lambda rects: " + data
         exp = eval(code)

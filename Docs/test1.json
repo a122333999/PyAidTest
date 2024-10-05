@@ -20,14 +20,18 @@
 					"name": "打开菜单",
 					"desc": ".......",
 					
-					"class": "image",
+					"class": "images",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "9a0fff5c-3d29-4eba-acae-29f2bf4b52c3",
-					
 					"config": {
-						"target": [],
-						"time": 1000,
+						"rect": {"top": null, "left":  null, "right": null, "bottom": null},
+						"offset": {"top": 0, "left":  0, "right": 0, "bottom": 0},
+						"source": "shot:none|last:none|uuid:UUID",
+						"targets": ["file:图片1", "file:图片2"],
+
+						"duration": 1000,
 						"count": 5,
 						"hit": 2
 					}
@@ -38,12 +42,13 @@
 					"name": "点击菜单",
 					"desc": ".......",
 					
-					"class": "move",
+					"class": "click",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "0fe433e2-f488-465c-aa06-9411e0490a3a",
 					"config": {
-						"point": "user:(16, 16)",
+						"point": "last:center",
 						"offset": {"x": 0, "y": 0},
 
 						"time": -1,
@@ -60,10 +65,11 @@
 
 					"class": "fork",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "7749684f-7ddf-4d8f-85c1-614d890c5165",
 					"config": {
-						"fork": {"goto": null, "eval": "uuid:9a0fff5c-3d29-4eba-acae-29f2bf4b52c3.rects[99]"}
+						"fork": {"goto": null, "eval": "last:default"}
 					}
 				},
 				{
@@ -74,6 +80,7 @@
 
 					"class": "empty",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": null,
 					"config": {}

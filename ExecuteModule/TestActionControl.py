@@ -4,6 +4,7 @@ from ExecuteModule.TestInput import TestInput
 from ExecuteModule.TestRuntime import TestRuntime
 from ExecuteModule.TestInterpret import TestInterpret
 
+
 _defaultFork = {"goto": None, "eval": "last:len(rects)==0"}
 _defaultInput = {"form": "none", "tips": "请选择下一步动作:"}
 _defaultScript = {"path": "", "args": ""}
@@ -19,6 +20,8 @@ class TestActionControl(TestAction):
         self._configFork = _defaultFork
         self._configInput = _defaultInput
         self._configScript = _defaultScript
+
+        self._defaultEval = (lambda rects: len(rects) == 0)
 
     def exec(self):
         if self.getClass() == 'fork':
@@ -48,7 +51,7 @@ class TestActionControl(TestAction):
 
     def _forkControl(self):
         # 1获取Lambda表达式 2执行表达式 3返回结果
-        fun, ret = TestInterpret.fn3(self._configFork["eval"])
+        fun, ret = TestInterpret.fn3(self._configFork["eval"], self._defaultEval)
         if fun is None:
             return TestResult(TestResult.CriticalFlag, "执行fork错误: 解析表达式异常")
         if ret is None:
@@ -120,5 +123,3 @@ def _inputHandle(curr: TestResult, data: TestInput, *args):
         return result
 
     return TestResult(TestResult.CriticalFlag, "执行input错误: 输入数据不合法")
-
-

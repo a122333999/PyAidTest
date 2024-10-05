@@ -97,6 +97,7 @@ class TestFactory:
             result.setDesc(data['desc'])
             result.setClass(data['class'])
             result.setDelay(data['delay'])
+            result.setTimes(data['times'])
             result.setRetry(data['retry'])
             result.setChild(data['child'])
             result.setConfig(data['config'])
@@ -111,6 +112,7 @@ class TestFactory:
             'desc': action.getDesc(),
             'class': action.getClass(),
             'delay': action.getDelay(),
+            'times': action.getTimes(),
             'retry': action.getRetry(),
             'child': action.getChild(),
             'config': action.getConfig(),

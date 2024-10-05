@@ -10,6 +10,7 @@ class TestAction(TestBase):
         self.setDesc("This TestAction")
         self._class = ""
         self._delay = 500
+        self._times = 0
         self._retry = 0
         self._child = None
 
@@ -21,6 +22,9 @@ class TestAction(TestBase):
 
     def setDelay(self, data):
         self._delay = data
+
+    def setTimes(self, data):
+        self._times = data
 
     def setRetry(self, data):
         self._retry = data
@@ -37,6 +41,9 @@ class TestAction(TestBase):
 
     def getDelay(self):
         return self._delay
+
+    def getTimes(self):
+        return self._times
 
     def getRetry(self):
         return self._retry

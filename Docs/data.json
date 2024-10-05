@@ -22,13 +22,14 @@
 
 					"class": "text(文字检查)|image(图片检查)|texts(文字采样检查)|images(图片采样检查)",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
 						"rect": {"top": "last:topCenter", "left":  "uuid:UUID.topLeft", "right": "user:(10,10)", "bottom": null},
 						"offset": {"top": 0, "left":  0, "right": 0, "bottom": 0},
 						"source": "shot:none|last:none|uuid:UUID",
-						"targets": ["file:图片1", "file:图片2"],
+						"targets": ["file:图片1", "file:图片2", "text:文字检查"],
 
 						"hit": 10,
 						"count": 10,
@@ -43,6 +44,7 @@
 
 					"class": "click(点击)|leftClick(左击)|rightClick(右击)|doubleClick(双击)|move(鼠标移动)|drag(鼠标拖动)|wheel(滚动)|key(按键)|keys(组合键)|copyPaste(复制粘贴)",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
@@ -63,10 +65,11 @@
 
 					"class": "fork(分叉)|input(输入)|finished(完成)|failed(失败)|script(脚本)",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "UUID",
 					"config": {
-						"fork": {"goto": "UUID", "eval": "last:Lambda|uuid:UUID.Lambda"},
+						"fork": {"goto": "UUID", "eval": "last:default|last:Lambda|uuid:UUID.Lambda"},
 						"input": {"form": "none|text","tips": "输入提示"},
 						"script": {"path": "脚本路径", "args": "脚本参数"}
 					}
@@ -79,6 +82,7 @@
 
 					"class": "empty",
 					"delay": 1000,
+					"times": 0,
 					"retry": 0,
 					"child": "UUID",
 					"config": {

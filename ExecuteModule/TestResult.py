@@ -83,6 +83,9 @@ class TestResult:
     def getRectList(self):
         return self._rects
 
+    def setRectsList(self, rects):
+        self._rects = rects
+
     def getRectInfo(self, index):
         return self._rects[index]
 
