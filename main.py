@@ -3,6 +3,7 @@ import time
 import uuid
 import pyscreeze
 import pyautogui
+import pytesseract
 from PySide6 import QtCore
 from PySide6.QtWidgets import QApplication
 from ExecuteModule.Execute import Execute
@@ -37,9 +38,15 @@ if __name__ == '__main__':
     # print(execute.getActionInfo(ret, 0, uuid.UUID('741ee909-d55c-45b5-8516-20ed160479cc')))
     # print(execute.getActionInfo(ret, 0, uuid.UUID('9a0fff5c-3d29-4eba-acae-29f2bf4b52c3')))
 
-    execute.start(handle, 0)
+    # execute.start(handle, 0)
     # execute.start(handle, 0)
     # execute.startAll(handle)
+
+    # img = pyscreeze.screenshot()
+    # ret = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+    # for index in range(len(ret["text"])):
+    #     if "PyGuiTest" in ret["text"][index]:
+    #         print(ret["text"][index], f"x={ret['left'][index]}, y={ret['top'][index]}, width={ret['width'][index]}, height={ret['height'][index]}")
 
     app = QApplication(sys.argv)
     window = MainWindow()

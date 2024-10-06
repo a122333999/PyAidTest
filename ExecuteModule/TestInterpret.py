@@ -126,7 +126,7 @@ def _extractLambda(data: str, defaultLambda):
         return None
     except SyntaxError:
         return None
-    except:
+    except Exception:
         return None
 
 

@@ -1,0 +1,12 @@
+{
+    "info": {
+         "version": 0,
+         "prefix": {}
+    },
+
+    "file": [
+        {"path": "path/file.tg", "class": "test"},
+        {"path": "path/file.py", "class": "script"},
+        {"path": "path/file.dbc", "class": "resource"}
+    ]
+}

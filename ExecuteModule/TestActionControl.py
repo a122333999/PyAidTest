@@ -63,8 +63,8 @@ class TestActionControl(TestAction):
             if fun(ret.getRectList()):
                 result.setNext(self._configFork["goto"])
             return result
-        except:
-            return TestResult(TestResult.CriticalFlag, "执行fork错误: 执行表达式异常")
+        except Exception as e:
+            return TestResult(TestResult.CriticalFlag, f"执行fork错误: 执行表达式异常({e})")
 
     def _inputControl(self):
         # 返回等待输入的TestResult(包括设定回调)

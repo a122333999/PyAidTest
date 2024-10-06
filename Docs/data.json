@@ -70,7 +70,7 @@
 					"child": "UUID",
 					"config": {
 						"fork": {"goto": "UUID", "eval": "last:default|last:Lambda|uuid:UUID.Lambda"},
-						"input": {"form": "none|text","tips": "输入提示"},
+						"input": {"tips": "输入提示", "form": "nobody:none|static:默认值|textbox:默认值"},
 						"script": {"path": "脚本路径", "args": "脚本参数"}
 					}
 				},
