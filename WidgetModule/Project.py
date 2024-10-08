@@ -18,8 +18,12 @@ def getProjectPath():
     return _projectObj.getProjectPath()
 
 
-def getFileList():
-    return _projectObj.getFileList()
+def getEntryList():
+    return _projectObj.getEntryList()
+
+
+def pathToEntry(path):
+    return _projectObj.pathToEntry(path)
 
 
 def instance():
@@ -40,7 +44,7 @@ class Project:
         try:
             with open(file, 'rb') as fp:
                 self._data = json.load(fp)
-                self._path = file
+                self._path = QFileInfo(file).absoluteFilePath()
                 return True
         except Exception as e:
             print("打开项目文件失败", e)
@@ -55,19 +59,45 @@ class Project:
             return False
 
     def isEmpty(self):
-        return self._path is None and self._data is None
+        return self._path is None or self._data is None
+
+    def hasEntry(self, entry):
+        return self.hasEntry_(entry)
+
+    def getEntryInfo(self, entry):
+        if self._data:
+            for item in self._data.get("entry", []):
+                if item["file"] == entry:
+                    return item
+        return None
+
+    def getEntryList(self):
+        result = []
+        if self._data:
+            for item in self._data.get("entry", []):
+                result.append(tuple(item.values()))
+        return result
+
+    def entryToPath(self, entry):
+        if self.hasEntry_(entry):
+            dir_ = QFileInfo(self._path).absoluteDir()
+            return dir_.filePath(entry)
+        return None
+
+    def pathToEntry(self, path):
+        if self._path and self._data:
+            dir_ = QFileInfo(self._path).absoluteDir()
+            info = QFileInfo(path)
+            for item in self._data.get("entry", []):
+                if dir_.filePath(item["file"]) == info.absoluteFilePath():
+                    return tuple(item.values())
+        return None
+
+    def clearProject(self):
+        pass
 
     def getProjectPath(self):
         return self._path
-
-    def getFileList(self):
-        result = []
-        if isinstance(self._data, dict):
-            for item in self._data.get("file", []):
-                if ("path" in item) and len(item["path"]):
-                    result.append(item["path"])
-
-        return result
 
     @classmethod
     def instance(cls):
@@ -97,6 +127,13 @@ class Project:
         if info.exists():
             return info.absoluteFilePath()
 
+    def hasEntry_(self, entry):
+        if self._data:
+            for item in self._data.get("entry", []):
+                if item["file"] == entry:
+                    return True
+        return False
+
 
 _projectObj = Project()
 _projectExt = ".json"
@@ -107,6 +144,6 @@ _projectTemp = \
          "version": 0,
          "prefix": {}
     },
-    "file": []
+    "entry": []
 }
 """

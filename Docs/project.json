@@ -6,9 +6,9 @@
          }
     },
 
-    "file": [
-        {"path": "path/file.tg", "class": "test"},
-        {"path": "path/file.py", "class": "script"},
-        {"path": "path/file.dbc", "class": "resource"}
+    "entry": [
+        {"file": "path/file.tg", "class": "test"},
+        {"file": "path/file.py", "class": "script"},
+        {"file": "path/file.dbc", "class": "resource"}
     ]
 }

@@ -1,10 +1,10 @@
 import os
 from PySide6.QtGui import Qt, QAction
-from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog, QDialog, QLabel, QLineEdit, QFormLayout
+from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog
 from WidgetModule import Project as ProjectModule
 from WidgetModule.DockWidget import DockWidget
 from WidgetModule.FileWidget import FileWidget
-from WidgetModule.TestWidget import TestWidget
+from WidgetModule.BoxWidget.BoxWidget import BoxWidget
 from WidgetModule.AttrWidget import AttrWidget
 from WidgetModule.LogWidget import LogWidget
 
@@ -29,7 +29,8 @@ class MainWindow(QMainWindow):
         self._menuBar.addMenu(self._fileMenu)
 
         self._fileWidget = FileWidget()
-        self._testWidget = TestWidget()
+        self._fileWidget.fileActivated.connect(self.onFileActivated)
+        self._boxWidget = BoxWidget()
         self._attrWidget = AttrWidget()
         self._logWidget = LogWidget()
 
@@ -42,7 +43,7 @@ class MainWindow(QMainWindow):
         dw = DockWidget()
         dw.setWidget(self._logWidget)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dw)
-        self.setCentralWidget(self._testWidget)
+        self.setCentralWidget(self._boxWidget)
         self.setMenuBar(self._menuBar)
 
         self.setWindowTitle("PyGuiTest")
@@ -71,6 +72,13 @@ class MainWindow(QMainWindow):
     def onFileSaveAction(self):
         print("保存项目", self)
 
+    def onFileActivated(self, path):
+        # 判断是否为entry
+        if entry := ProjectModule.pathToEntry(path):
+            self._boxWidget.addTabPage(entry)
+        else:
+            self._boxWidget.addTabPageForFile(path)
+
     def _loadProject(self, path):
         if not ProjectModule.load(path):
             print("项目打开失败")
@@ -78,7 +86,7 @@ class MainWindow(QMainWindow):
 
         # 打开项目成功的处理
         self._attrWidget.clearContent()
-        self._testWidget.clearContent()
+        self._boxWidget.clearContent()
         self._fileWidget.updateContent(ProjectModule.getProjectPath())
         return True
 
