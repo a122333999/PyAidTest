@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QApplication
 from ExecuteModule.Execute import Execute
 from WidgetModule.Window import MainWindow
 
+
 from ExecuteModule.TestRect import TestRect
 
 
@@ -44,9 +45,6 @@ if __name__ == '__main__':
 
     # img = pyscreeze.screenshot()
     # ret = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
-    # for index in range(len(ret["text"])):
-    #     if "PyGuiTest" in ret["text"][index]:
-    #         print(ret["text"][index], f"x={ret['left'][index]}, y={ret['top'][index]}, width={ret['width'][index]}, height={ret['height'][index]}")
 
     app = QApplication(sys.argv)
     window = MainWindow()

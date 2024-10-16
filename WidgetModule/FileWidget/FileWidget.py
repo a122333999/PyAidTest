@@ -1,7 +1,7 @@
 from PySide6 import QtCore
 from PySide6.QtCore import QSize, QFileInfo
 from PySide6.QtWidgets import QWidget, QTreeView, QVBoxLayout
-from WidgetModule.FileModel import FileModel
+from WidgetModule.FileWidget.FileModel import FileModel
 
 
 class FileWidget(QWidget):

@@ -1,8 +1,9 @@
 from PySide6 import QtCore
 from PySide6.QtCore import QFileInfo
-from PySide6.QtWidgets import QVBoxLayout
-from PySide6.QtWidgets import QWidget, QTreeView, QTabWidget
+from PySide6.QtWidgets import QVBoxLayout, QMessageBox
+from PySide6.QtWidgets import QWidget, QTabWidget
 from WidgetModule import Project as ProjectModule
+from WidgetModule import ExecuteManager
 from WidgetModule.BoxWidget.BoxHomeWidget import BoxHomeWidget
 from WidgetModule.BoxWidget.BoxTestWidget import BoxTestWidget
 from WidgetModule.BoxWidget.BoxEditWidget import BoxEditWidget
@@ -31,29 +32,34 @@ class BoxWidget(QWidget):
         pass
 
     def addTabPage(self, entry):
-        if entry[0] in self._entryPage:
-            self._changeCurrentPage(entry[0])
+        entry0, entry1 = entry
+        if entry0 in self._entryPage:
+            self._changeCurrentPage(entry0)
             return False
 
-        name = QFileInfo(entry[0]).fileName()
-        if entry[1] == "test":
-            widget = BoxTestWidget()
-            widget.setProperty("iden", entry[0])
-            self._entryPage.add(entry[0])
+        name = QFileInfo(entry0).fileName()
+        if entry1 == "test":
+            if ExecuteManager.load(entry0):
+                widget = BoxTestWidget(entry0)
+                widget.setProperty("iden", entry0)
+                self._entryPage.add(entry0)
+                self._tabWidget.addTab(widget, name)
+                self._tabWidget.setCurrentWidget(widget)
+                return True
+            else:
+                QMessageBox.critical(self, "错误", "文件打开失败")
+                return False
+        elif entry1 == "script":
+            widget = BoxEditWidget(entry0)
+            widget.setProperty("iden", entry0)
+            self._entryPage.add(entry0)
             self._tabWidget.addTab(widget, name)
             self._tabWidget.setCurrentWidget(widget)
             return True
-        elif entry[1] == "script":
-            widget = BoxEditWidget()
-            widget.setProperty("iden", entry[0])
-            self._entryPage.add(entry[0])
-            self._tabWidget.addTab(widget, name)
-            self._tabWidget.setCurrentWidget(widget)
-            return True
-        elif entry[1] == "resource":
-            widget = BoxImageWidget()
-            widget.setProperty("iden", entry[0])
-            self._entryPage.add(entry[0])
+        elif entry1 == "resource":
+            widget = BoxImageWidget(entry0)
+            widget.setProperty("iden", entry0)
+            self._entryPage.add(entry0)
             self._tabWidget.addTab(widget, name)
             self._tabWidget.setCurrentWidget(widget)
             return True
@@ -66,7 +72,7 @@ class BoxWidget(QWidget):
             return False
 
         name = QFileInfo(file).fileName()
-        widget = BoxImageWidget()
+        widget = BoxImageWidget(file)
         widget.setProperty("iden", file)
         self._filePage.add(file)
         self._tabWidget.addTab(widget, name)

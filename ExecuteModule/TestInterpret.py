@@ -4,6 +4,11 @@ from ExecuteModule.TestRect import TestRect
 from UtilsModule.CommonUtils import CommonUtils
 
 
+# ${app} - 执行程序所在目录 代码获取/自行设置
+# ${pro} - 当前工程所在目录 等价${case}/自行设置
+# ${case} - 测试用例所在目录 代码获取/不可设置
+
+
 class TestInterpret:
 
     @classmethod

@@ -1,6 +1,7 @@
 import pyautogui
 from uuid import UUID
 from PySide6 import QtCore
+from UtilsModule.CommonUtils import CommonUtils
 from ExecuteModule.TestGroup import TestGroup
 from ExecuteModule.TestResult import TestResult
 from ExecuteModule.TestFactory import TestFactory
@@ -78,76 +79,47 @@ class Execute(QtCore.QObject):
                 TestRuntime.isWaiting = False
                 TestRuntime.isStopping = False
 
+    def getHandleInfo(self, handle):
+        if handle in self._handleList:
+            return TestFactory.formatGroup(self._handleList[handle], True)
+
     def getHandleList(self):
         result = list()
         for handle in self._handleList:
-            result.append({
-                "type": self._handleList[handle].getType(),
-                "iden": self._handleList[handle].getIden(),
-                "name": self._handleList[handle].getName(),
-                "desc": self._handleList[handle].getDesc(),
-            })
+            result.append(TestFactory.formatGroup(self._handleList[handle], True))
         return result
-
-    def getHandleInfo(self, handle):
-        if handle in self._handleList:
-            return {
-                "type": self._handleList[handle].getType(),
-                "iden": self._handleList[handle].getIden(),
-                "name": self._handleList[handle].getName(),
-                "desc": self._handleList[handle].getDesc(),
-            }
 
     def getCaseList(self, handle):
         result = list()
-        search = _findGroup(self._handleList, handle)
-        if search is not None:
+        if search := _findGroup(self._handleList, handle):
             for item in search.getCaseList():
-                result.append({
-                    "type": item.getType(),
-                    "iden": item.getIden(),
-                    "name": item.getName(),
-                    "desc": item.getDesc()
-                })
+                result.append(TestFactory.formatCase(item, True))
         return result
 
     def getCaseInfo(self, handle, case: int | UUID):
-        search = _findCase(self._handleList, handle, case)
-        if search is not None:
-            return {
-                "type": search.getType(),
-                "iden": search.getIden(),
-                "name": search.getName(),
-                "desc": search.getDesc(),
-            }
+        if search := _findCase(self._handleList, handle, case):
+            return TestFactory.formatCase(search, True)
 
     def getActionList(self, handle, case: int | UUID):
         result = list()
-        search = _findCase(self._handleList, handle, case)
-        if search is not None:
+        if search := _findCase(self._handleList, handle, case):
             for item in search.getActionList():
-                result.append({
-                    "type": item.getType(),
-                    "iden": item.getIden(),
-                    "name": item.getName(),
-                    "desc": item.getDesc(),
-                    "config": item.getConfig()
-                })
+                result.append(TestFactory.formatAction(item, True))
         return result
 
     def getActionInfo(self, handle, case: int | UUID, action: UUID):
-        search = _findAction(self._handleList, handle, case, action)
-        if search is not None:
-            return {
-                "type": search.getType(),
-                "iden": search.getIden(),
-                "name": search.getName(),
-                "desc": search.getDesc(),
-                "config": search.getConfig()
-            }
+        if search := _findAction(self._handleList, handle, case, action):
+            return TestFactory.formatAction(search, True)
 
     def getErrorInfo(self):
         pass  # TODO
+
+    def addPathPrefix(self, key, value):
+        self.objectName()  # 无意义 避免警告
+        TestRuntime.pathPrefix[key] = value
+
+    def hasHandle(self, handle):
+        return handle in self._handleList
 
     @QtCore.Slot(dict)
     def onCaseStatusChanged(self, data):
@@ -195,20 +167,18 @@ def _findGroup(dataset, handle):
 
 
 def _findCase(dataset, handle, case: int | UUID):
-    group = _findGroup(dataset, handle)
-    if group is not None:
+    if group := _findGroup(dataset, handle):
         lis = group.getCaseList()
         if isinstance(case, int) and case < len(lis):
             return lis[case]
-        elif isinstance(case, UUID):
+        elif CommonUtils.checkUuid(case):
             for item in lis:
                 if item.getIden() == case:
                     return item
 
 
 def _findAction(dataset, handle, case: int | UUID, action: UUID):
-    case = _findCase(dataset, handle, case)
-    if case is not None:
+    if case := _findCase(dataset, handle, case):
         for item in case.getActionList():
             if item.getIden() == action:
                 return item

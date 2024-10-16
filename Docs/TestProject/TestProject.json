@@ -5,8 +5,9 @@
     },
 
     "entry": [
-        {"file": "path/file.tg", "class": "test"},
-        {"file": "path/file.py", "class": "script"},
-        {"file": "Resource/123", "class": "resource"}
+        {"file": "Test/test1.tf", "type": "test"},
+        {"file": "Test/test2.tf", "type": "test"},
+        {"file": "path/file.py", "type": "script"},
+        {"file": "Resource/123", "type": "resource"}
     ]
 }

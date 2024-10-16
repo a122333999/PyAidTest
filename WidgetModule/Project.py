@@ -14,16 +14,32 @@ def isEmpty():
     return _projectObj.isEmpty()
 
 
-def getProjectPath():
-    return _projectObj.getProjectPath()
-
-
 def getEntryList():
     return _projectObj.getEntryList()
 
 
+def getTestEntryList():
+    return _projectObj.getTestEntryList()
+
+
+def getScriptEntryList():
+    return _projectObj.getScriptEntryList()
+
+
+def getResourceEntryList():
+    return _projectObj.getResourceEntryList()
+
+
 def pathToEntry(path):
     return _projectObj.pathToEntry(path)
+
+
+def getProjectPath():
+    return _projectObj.getProjectPath()
+
+
+def getProjectDirectory():
+    return _projectObj.getProjectDirectory()
 
 
 def instance():
@@ -78,6 +94,30 @@ class Project:
                 result.append(tuple(item.values()))
         return result
 
+    def getTestEntryList(self):
+        result = []
+        if self._data:
+            for item in self._data.get("entry", []):
+                if item["type"] == "test":
+                    result.append(tuple(item.values()))
+        return result
+
+    def getScriptEntryList(self):
+        result = []
+        if self._data:
+            for item in self._data.get("entry", []):
+                if item["type"] == "script":
+                    result.append(tuple(item.values()))
+        return result
+
+    def getResourceEntryList(self):
+        result = []
+        if self._data:
+            for item in self._data.get("entry", []):
+                if item["type"] == "resource":
+                    result.append(tuple(item.values()))
+        return result
+
     def entryToPath(self, entry):
         if self.hasEntry_(entry):
             dir_ = QFileInfo(self._path).absoluteDir()
@@ -98,6 +138,9 @@ class Project:
 
     def getProjectPath(self):
         return self._path
+
+    def getProjectDirectory(self):
+        return QFileInfo(self._path).absolutePath()
 
     @classmethod
     def instance(cls):

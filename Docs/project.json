@@ -1,14 +1,15 @@
 {
     "info": {
-         "version": 0,
-         "prefix": {
-              "${custom}": "custom"
-         }
+        "version": 0,
+        "speed": 1,
+        "prefix": {
+            "${custom}": "custom"
+        }
     },
 
     "entry": [
-        {"file": "path/file.tg", "class": "test"},
-        {"file": "path/file.py", "class": "script"},
-        {"file": "path/file.dbc", "class": "resource"}
+        {"file": "path/file.tg", "type": "test"},
+        {"file": "path/file.py", "type": "script"},
+        {"file": "path/file.dbc", "type": "resource"}
     ]
 }

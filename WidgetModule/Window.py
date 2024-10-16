@@ -2,11 +2,12 @@ import os
 from PySide6.QtGui import Qt, QAction
 from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog
 from WidgetModule import Project as ProjectModule
+from WidgetModule import ExecuteManager
 from WidgetModule.DockWidget import DockWidget
-from WidgetModule.FileWidget import FileWidget
+from WidgetModule.FileWidget.FileWidget import FileWidget
 from WidgetModule.BoxWidget.BoxWidget import BoxWidget
-from WidgetModule.AttrWidget import AttrWidget
-from WidgetModule.LogWidget import LogWidget
+from WidgetModule.AttrWidget.AttrWidget import AttrWidget
+from WidgetModule.LogWidget.LogWidget import LogWidget
 
 
 class MainWindow(QMainWindow):
@@ -84,11 +85,19 @@ class MainWindow(QMainWindow):
             print("项目打开失败")
             return False
 
-        # 打开项目成功的处理
+        if not ExecuteManager.init(ProjectModule.getProjectDirectory()):
+            return False
+
+        for entry0, entry1 in ProjectModule.getTestEntryList():
+            if not ExecuteManager.load(entry0):
+                # TODO: 打开失败时的清理
+                return False
+
         self._attrWidget.clearContent()
         self._boxWidget.clearContent()
         self._fileWidget.updateContent(ProjectModule.getProjectPath())
         return True
+
 
 
 

@@ -14,6 +14,12 @@ class TestRuntime:
     inputData = None
     errorList = list()
 
+    pathPrefix = {
+        "${app}": "",
+        "${pro}": "",
+        "${case}": ""
+    }
+
     @classmethod
     def clear(cls):
         cls.isRunning = False
