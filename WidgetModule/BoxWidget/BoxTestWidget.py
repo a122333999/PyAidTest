@@ -8,7 +8,6 @@ class BoxTestWidget(QWidget):
         super().__init__()
         self._iden = iden
         self._view = QTreeView()
-        self._view.setHeaderHidden(True)
         self._model = BoxTestModel()
         self._view.setModel(self._model)
 

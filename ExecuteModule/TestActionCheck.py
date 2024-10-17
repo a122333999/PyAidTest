@@ -60,8 +60,8 @@ class TestActionCheck(TestAction):
             "source": self._configSource,
             "targets": self._configTargets,
             "hit": self._configHit,
-            "time": self._configDuration,
             "count": self._configCount,
+            "duration": self._configDuration,
         }
 
     def _textCheck(self):

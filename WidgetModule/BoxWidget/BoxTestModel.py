@@ -5,8 +5,9 @@ from WidgetModule import ExecuteManager
 """
 ModelNode {
     icon: None
-    type: "case|action|other"
-    data:["第一列"]
+    info: TestInfo
+    type: "case|action|hint|sep"
+    title: None
     parent: ModelNode
     children: [ModelNode, ModelNode, ...]
 }
@@ -17,11 +18,12 @@ class BoxTestModel(QAbstractItemModel):
 
     def __init__(self):
         super().__init__()
-        self._root = {"icon": None, "type": "", "data": ["AAA"], "parent": None, "children": []}
+        self._root = {"icon": None, "info": None, "type": "other", "parent": None, "children": []}
+        self._header = ["名称", "类型", "标识", "描述"]
 
     def updateModel(self, iden):
         self.beginResetModel()
-        _generate(iden, self._root)
+        _generateCase(iden, self._root)
         self.endResetModel()
 
     def index(self, row, column, parent=None):
@@ -49,16 +51,16 @@ class BoxTestModel(QAbstractItemModel):
         return len(self._root["children"])
 
     def columnCount(self, parent=None):
-        if parent.isValid():
-            node = parent.internalPointer()
-            return len(node["data"])
-        return len(self._root["data"])
+        return len(self._header)
 
     def data(self, index, role=...):
         if index.isValid():
             node = index.internalPointer()
+            # 显示角色
             if role == Qt.ItemDataRole.DisplayRole:
-                return node["data"][index.column()]
+                displays = self._retDisplays(node)
+                return displays[index.column()]
+            # 图标角色
             elif role == Qt.ItemDataRole.DecorationRole:
                 return node["icon"]
         return None
@@ -69,77 +71,148 @@ class BoxTestModel(QAbstractItemModel):
     def headerData(self, section, orientation, role=...):
         if role == Qt.ItemDataRole.DisplayRole:
             if orientation == Qt.Orientation.Horizontal:
-                return self._root["data"][section]
+                return self._header[section]
+            elif orientation == Qt.Orientation.Vertical:
+                return section
         return super().headerData(section, orientation, role)
 
     def flags(self, index):
         return super().flags(index)
 
+    @staticmethod
+    def _retDisplays(node):
+        result = []
+        if node["type"] == "sep":
+            result.append("")
+            result.append("")
+            result.append("")
+            result.append("")
+        elif node["type"] == "hint":
+            result.append(node["title"])
+            result.append("提示条目")
+            result.append("")
+            result.append("")
+        elif info := node.get("info", None):
+            keys = {
+                "case": "测试用例",
+                "check": "检查动作",
+                "empty": "空动作",
+                "operate": "操作动作",
+                "control": "控制动作"
+            }
+            result.append(info["baseName"])
+            result.append(keys.get(info["baseType"], ""))
+            result.append(info["baseIden"])
+            result.append(info["baseDesc"])
 
-def _generate(entry, parent):
-    for case in ExecuteManager.getCaseList(entry):
-        title = f"启用: {case['active']} {case['name']}  -  {case['desc']}"
-        node = _createNode(None, "case", [title], parent)
+        return result
 
+
+def _generateCase(entry, parent):
+    for caseInfo in ExecuteManager.getCaseList(entry):
+        # 创建用例节点
+        caseNode = _createCaseNode(caseInfo, parent)
+
+        # 收集动作信息
         actionSet = dict()
-        for action in ExecuteManager.getActionList(entry, case["iden"]):
-            actionSet[action["iden"]] = action
+        for action in ExecuteManager.getActionList(entry, caseInfo["baseIden"]):
+            actionSet[action["baseIden"]] = action
 
-        iden = case["start"]
+        # 生成动作链条
+        iden = caseInfo["caseStart"]
         if iden in actionSet:
-            _generateLink(iden, actionSet, node)
+            _generateAction(iden, actionSet, caseNode)
 
-        # 未使用的节点
+        # 处理未使用的节点
         if len(actionSet):
-            title = f"未使用节点"
-            unused = _createNode(None, "other", [title], node)
+            # _createSepNone(caseNode)
+            unNode = _createHintNone("未使用节点", caseNode)
             for action in actionSet.values():
-                title = f"{action['name']}  -  {action['desc']}"
-                act = _createNode(None, "action", [title], unused)
+                _createActionNode(action, unNode)
+            # _createSepNone(caseNode)
 
 
-def _generateLink(iden, actionSet, parent):
+def _generateAction(iden, actionSet, parent):
     subset = list()
-    action = actionSet.get(iden, None)
-    while action:
-        title = f"{action['name']}  -  {action['desc']}"
-        node = _createNode(None, "action", [title], parent)
+    actInfo = actionSet.get(iden, None)
+    while actInfo:
+        # 创建节点
+        actNode = _createActionNode(actInfo, parent)
 
-        # fork节点
-        if conf_ := action.get("config", None):
-            if fork_ := conf_.get("fork", None):
-                if goto_ := fork_.get("goto", None):
-                    if goto_ in actionSet:
-                        subset.append((goto_, node))
-                    else:
-                        title = f" → 跳转到{goto_}"
-                        _createNode(None, "other", [title], node)
+        # 记录分叉节点
+        if goto_ := actInfo.get("controlForkGoto", None):
+            subset.append((goto_, actNode))
 
+        # 获取子节点标识
         del actionSet[iden]
-        iden = action.get("child", None)
+        iden = actInfo.get("actionChild", None)
         if iden is None:
-            break
-        action = actionSet.get(iden, None)
-        if action is None:
-            title = f" → 跳转到{iden}"
-            _createNode(None, "other", [title], parent)
+            _createHintNone(f" - 执行结束", parent)
             break
 
+        # 获取子节点信息
+        actInfo = actionSet.get(iden, None)
+        if actInfo is None:
+            _createHintNone(f" → 跳转到{iden}", parent)
+            break
+
+    # 递归处理下一层级
     for iden, node in subset:
-        _generateLink(iden, actionSet, node)
+        if iden in actionSet:
+            _generateAction(iden, actionSet, node)
+        elif iden is not None:
+            _createHintNone(f" → 跳转到{iden}", node)
+        else:
+            _createHintNone(f" - 执行结束", node)
 
 
-def _createNode(icon, type_, data, parent):
-    # 根据节点类型创建
+def _createCaseNode(info, parent):
     result = {
-        "icon": icon,
-        "type": type_,
-        "data": data,
+        "icon": None,
+        "info": info,
+        "type": "case",
+        "title": None,
         "parent": parent,
         "children": []
     }
     parent["children"].append(result)
     return result
 
-#
 
+def _createActionNode(info, parent):
+    result = {
+        "icon": None,
+        "info": info,
+        "type": "action",
+        "title": None,
+        "parent": parent,
+        "children": []
+    }
+    parent["children"].append(result)
+    return result
+
+
+def _createSepNone(parent):
+    result = {
+        "icon": None,
+        "info": None,
+        "type": "sep",
+        "title": "",
+        "parent": parent,
+        "children": []
+    }
+    parent["children"].append(result)
+    return result
+
+
+def _createHintNone(title, parent):
+    result = {
+        "icon": None,
+        "info": None,
+        "type": "hint",
+        "title": title,
+        "parent": parent,
+        "children": []
+    }
+    parent["children"].append(result)
+    return result
