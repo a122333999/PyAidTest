@@ -2,7 +2,7 @@ import os
 
 from PySide6 import QtCore
 from PySide6.QtGui import Qt, QAction
-from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog
+from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog, QToolBar
 from WidgetModule import Project as ProjectModule
 from WidgetModule import ExecuteManager
 from WidgetModule.LogWidget import LogInst as log
@@ -29,8 +29,13 @@ class MainWindow(QMainWindow):
         self._fileMenu.addAction(self._fileSaveAction)
         self._fileMenu.addSeparator()
         self._fileMenu.addAction("关闭", lambda: self.close())
+        self._runMenu = QMenu("Run")
+        self._runRunAction = QAction("运行文件", self)
+        self._runMenu.addAction(self._runRunAction)
         self._menuBar = QMenuBar()
+        self._menuBar.setContentsMargins(0, 0, 0, 0)
         self._menuBar.addMenu(self._fileMenu)
+        self._menuBar.addMenu(self._runMenu)
 
         self._fileWidget = FileWidget()
         self._fileWidget.fileActivated.connect(self.onFileActivated)
@@ -43,16 +48,23 @@ class MainWindow(QMainWindow):
         self._logWidget = LogWidget()
 
         dw = DockWidget()
+        dw.setWindowTitle("项目")
         dw.setWidget(self._fileWidget)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, dw)
         dw = DockWidget()
+        dw.setWindowTitle("属性")
         dw.setWidget(self._attrWidget)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dw)
         dw = DockWidget()
+        dw.setWindowTitle("日志")
         dw.setWidget(self._logWidget)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, dw)
         self.setCentralWidget(self._boxWidget)
         self.setMenuBar(self._menuBar)
+
+        self._toolBar = QToolBar(self)
+        self._toolBar.addAction("AA")
+        self._menuBar.setCornerWidget(self._toolBar)
 
         self.setWindowTitle("PyGuiTest")
         self.resize(1200, 720)

@@ -2,6 +2,9 @@ import json
 from PySide6.QtCore import QDir, QFileInfo
 
 
+# TODO: 打开任意文件都成功
+
+
 def load(file):
     return _projectObj.load(file)
 

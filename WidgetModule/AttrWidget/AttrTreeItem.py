@@ -396,7 +396,7 @@ class AttrOperateConfig(QTreeWidgetItem):
         operateOffsetY = str(info.get("operateOffsetY", 0))
         operateTime = str(info.get("operateTime", 0))
         operateKeys = info.get("operateKeys", [])
-        operateKeys = f"[{str(", ").join(operateKeys)}]"
+        operateKeys = str(", ").join(operateKeys)
         operateRoll = str(info.get("operateRoll", 0))
         operateContent = info.get("operateContent", "")
 
@@ -430,13 +430,42 @@ class AttrOperateConfig(QTreeWidgetItem):
             self._isShowContent = True
 
     def getInfo(self, info):
-        pass
+        operatePoint = self._operatePoint.text(1)
+        operateOffsetX = self._operateOffsetX.text(1)
+        operateOffsetX = int(operateOffsetX)
+        operateOffsetY = self._operateOffsetY.text(1)
+        operateOffsetY = int(operateOffsetY)
+        operateTime = self._operateTime.text(1)
+        operateTime = int(operateTime)
+        operateKeys = self._operateKeys.text(1)
+        operateKeys = self._splitKeys()
+        operateRoll = self._operateRoll.text(1)
+        operateRoll = int(operateRoll)
+        operateContent = self._operateContent.text(1)
+        info.update({
+            "operatePoint": operatePoint,
+            "operateOffsetX": operateOffsetX,
+            "operateOffsetY": operateOffsetY,
+            "operateTime": operateTime,
+            "operateKeys": operateKeys,
+            "operateRoll": operateRoll,
+            "operateContent": operateContent,
+        })
 
     def updateItem(self):
         self._operateTime.setHidden(not self._isShowTime)
         self._operateKeys.setHidden(not self._isShowKeys)
         self._operateRoll.setHidden(not self._isShowRoll)
         self._operateContent.setHidden(not self._isShowContent)
+
+    def _splitKeys(self):
+        result = list()
+        text = self._operateKeys.text(1)
+        text = text.replace(" ", "")
+        for key in text.split(","):
+            if len(key):
+                result.append(key)
+        return result
 
 
 class AttrControlConfig(QTreeWidgetItem):
@@ -503,7 +532,21 @@ class AttrControlConfig(QTreeWidgetItem):
             self._isShowScript = True
 
     def getInfo(self, info):
-        pass
+        controlForkGoto = self._controlForkGoto.text(1)
+        controlForkGoto = controlForkGoto if CommonUtils.checkUuid(controlForkGoto) else None
+        controlForkEval = self._controlForkEval.text(1)
+        controlInputTips = self._controlInputTips.text(1)
+        controlInputForm = self._controlInputForm.text(1)
+        controlScriptPath = self._controlScriptPath.text(1)
+        controlScriptArgs = self._controlScriptArgs.text(1)
+        info.update({
+            "controlForkGoto": controlForkGoto,
+            "controlForkEval": controlForkEval,
+            "controlInputTips": controlInputTips,
+            "controlInputForm": controlInputForm,
+            "controlScriptPath": controlScriptPath,
+            "controlScriptArgs": controlScriptArgs,
+        })
 
     def updateItem(self):
         self._controlForkGoto.setHidden(not self._isShowFork)

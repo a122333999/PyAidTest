@@ -381,6 +381,7 @@ def setActionInfo(entry, index, uuid, info):
             "times": int(info["actionTimes"]),
             "retry": int(info["actionRetry"]),
             "child": str(info["actionChild"]) if isinstance(info["actionChild"], str) else None,
+            "config": {}  # 不能删除
         }
         if "check" == info["baseType"]:
             temp.update({

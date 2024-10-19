@@ -219,7 +219,10 @@ def _createSepNone(parent):
         "title": "",
         "parent": parent,
         "children": [],
-        "addition": {"caseIden": None, "actionIden": None}
+        "addition": {
+            "caseIden": parent["addition"]["caseIden"],
+            "actionIden": None,
+        }
     }
     parent["children"].append(result)
     return result
@@ -233,7 +236,10 @@ def _createHintNone(title, parent):
         "title": title,
         "parent": parent,
         "children": [],
-        "addition": {"caseIden": None, "actionIden": None}
+        "addition": {
+            "caseIden": parent["addition"]["caseIden"],
+            "actionIden": None,
+        }
     }
     parent["children"].append(result)
     return result
