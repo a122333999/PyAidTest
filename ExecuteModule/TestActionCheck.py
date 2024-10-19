@@ -44,6 +44,11 @@ class TestActionCheck(TestAction):
 
         return TestResult(TestResult.CriticalFlag, "执行check错误: 没有找到匹配的class")
 
+    def setClass(self, data):
+        if data in ["text", "image", "texts", "images"]:
+            return super().setClass(data)
+        return False
+
     def setConfig(self, data):
         self._configRect = _returnConfigsValue('rect', data)
         self._configOffset = _returnConfigsValue('offset', data)
@@ -52,6 +57,7 @@ class TestActionCheck(TestAction):
         self._configHit = _returnConfigsValue('hit', data)
         self._configCount = _returnConfigsValue('count', data)
         self._configDuration = _returnConfigsValue('duration', data)
+        return True
 
     def getConfig(self):
         return {

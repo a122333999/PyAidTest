@@ -10,6 +10,7 @@ ModelNode {
     title: None
     parent: ModelNode
     children: [ModelNode, ModelNode, ...]
+    addition: {caseIden, actionIden}
 }
 """
 
@@ -18,13 +19,22 @@ class BoxTestModel(QAbstractItemModel):
 
     def __init__(self):
         super().__init__()
-        self._root = {"icon": None, "info": None, "type": "other", "parent": None, "children": []}
+        self._root = {"icon": None, "info": None, "type": "other", "parent": None, "children": [],
+                      "addition": {"caseIden": None, "actionIden": None}}
         self._header = ["名称", "类型", "标识", "描述"]
 
     def updateModel(self, iden):
         self.beginResetModel()
         _generateCase(iden, self._root)
         self.endResetModel()
+
+    def getCaseAndActionIden(self, index):
+        self.__str__()
+        if index.isValid():
+            if node := index.internalPointer():
+                if addition := node.get("addition", None):
+                    return addition.get("caseIden", None), addition.get("actionIden", None)
+        return None, None
 
     def index(self, row, column, parent=None):
         if not super().hasIndex(row, column, parent):
@@ -89,7 +99,7 @@ class BoxTestModel(QAbstractItemModel):
             result.append("")
         elif node["type"] == "hint":
             result.append(node["title"])
-            result.append("提示条目")
+            result.append("")
             result.append("")
             result.append("")
         elif info := node.get("info", None):
@@ -109,6 +119,7 @@ class BoxTestModel(QAbstractItemModel):
 
 
 def _generateCase(entry, parent):
+    parent["children"].clear()
     for caseInfo in ExecuteManager.getCaseList(entry):
         # 创建用例节点
         caseNode = _createCaseNode(caseInfo, parent)
@@ -173,7 +184,11 @@ def _createCaseNode(info, parent):
         "type": "case",
         "title": None,
         "parent": parent,
-        "children": []
+        "children": [],
+        "addition": {
+            "caseIden": info.get("baseIden"),
+            "actionIden": None,
+        }
     }
     parent["children"].append(result)
     return result
@@ -186,7 +201,11 @@ def _createActionNode(info, parent):
         "type": "action",
         "title": None,
         "parent": parent,
-        "children": []
+        "children": [],
+        "addition": {
+            "caseIden": parent["addition"]["caseIden"],
+            "actionIden": info.get("baseIden"),
+        }
     }
     parent["children"].append(result)
     return result
@@ -199,7 +218,8 @@ def _createSepNone(parent):
         "type": "sep",
         "title": "",
         "parent": parent,
-        "children": []
+        "children": [],
+        "addition": {"caseIden": None, "actionIden": None}
     }
     parent["children"].append(result)
     return result
@@ -212,7 +232,8 @@ def _createHintNone(title, parent):
         "type": "hint",
         "title": title,
         "parent": parent,
-        "children": []
+        "children": [],
+        "addition": {"caseIden": None, "actionIden": None}
     }
     parent["children"].append(result)
     return result

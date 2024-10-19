@@ -6,6 +6,7 @@ from WidgetModule.FileWidget.FileModel import FileModel
 
 class FileWidget(QWidget):
 
+    # args: 文件的绝对路径
     fileActivated = QtCore.Signal(str)
 
     def __init__(self):
@@ -13,12 +14,11 @@ class FileWidget(QWidget):
         self._treeModel = FileModel()
         self._treeView = QTreeView()
         self._treeView.setModel(self._treeModel)
+        self._treeView.doubleClicked.connect(self._onViewDoubleClicked)
 
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self._treeView)
-
-        self._treeView.doubleClicked.connect(self._onViewDoubleClicked)
 
     def updateContent(self, path: str):
         info = QFileInfo(path)
@@ -28,7 +28,7 @@ class FileWidget(QWidget):
         return False
 
     def sizeHint(self):
-        return QSize(200, -1)
+        return QSize(260, -1)
 
     def _onViewDoubleClicked(self, index):
         if index.isValid():

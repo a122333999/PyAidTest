@@ -37,10 +37,16 @@ class TestActionControl(TestAction):
 
         return TestResult(TestResult.CriticalFlag, "执行control错误: 没有找到匹配的class")
 
+    def setClass(self, data):
+        if data in ['fork', 'input', 'finished', 'failed', 'script']:
+            return super().setClass(data)
+        return False
+
     def setConfig(self, data):
         self._configFork = _returnConfigsValue('fork', data)
         self._configInput = _returnConfigsValue('input', data)
         self._configScript = _returnConfigsValue('script', data)
+        return True
 
     def getConfig(self):
         return {

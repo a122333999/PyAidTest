@@ -8,7 +8,6 @@ from ExecuteModule.TestFactory import TestFactory
 from ExecuteModule.TestRuntime import TestRuntime
 from ExecuteModule.TestInput import TestInput as Input
 
-
 # TODO: 模块重入限制
 # 说明: 测试组里的测试用例是有序的
 
@@ -40,16 +39,31 @@ class Execute(QtCore.QObject):
     def __init__(self):
         super().__init__()
         self._handleList = dict()
+        self._handlePath = dict()
 
     def load(self, path):
         ret = TestFactory.importFile(path)
         if isinstance(ret, TestGroup):
             self._handleList[id(ret)] = ret
+            self._handlePath[id(ret)] = path
             return id(ret)
         return 0
 
     def unload(self, handle):
         self._handleList.pop(handle)
+        self._handlePath.pop(handle)
+
+    def save(self, handle):
+        if group := _findGroup(self._handleList, handle):
+            ret = TestFactory.exportFile(self._handlePath[handle], group)
+            if not isinstance(ret, Exception) and ret:
+                return True
+            else:
+                pass  # 输出错误
+        return False
+
+    def saveAs(self, handle, path):
+        pass
 
     def start(self, handle, case: int | UUID):  # 启动指定用例
         return self._start(handle, case)
@@ -79,15 +93,21 @@ class Execute(QtCore.QObject):
                 TestRuntime.isWaiting = False
                 TestRuntime.isStopping = False
 
-    def getHandleInfo(self, handle):
-        if handle in self._handleList:
-            return TestFactory.formatGroup(self._handleList[handle], True)
-
     def getHandleList(self):
         result = list()
         for handle in self._handleList:
-            result.append(TestFactory.formatGroup(self._handleList[handle], True))
+            search = _findGroup(self._handleList, handle)
+            result.append(TestFactory.formatGroup(search, True))
         return result
+
+    def getHandleInfo(self, handle):
+        if search := _findGroup(self._handleList, handle):
+            return TestFactory.formatGroup(search, True)
+
+    def setHandleInfo(self, handle, info):
+        if search := _findGroup(self._handleList, handle):
+            return TestFactory.updateGroup(search, info)
+        return False
 
     def getCaseList(self, handle):
         result = list()
@@ -100,6 +120,11 @@ class Execute(QtCore.QObject):
         if search := _findCase(self._handleList, handle, case):
             return TestFactory.formatCase(search, True)
 
+    def setCaseInfo(self, handle, case: int | UUID, info):
+        if search := _findCase(self._handleList, handle, case):
+            return TestFactory.updateCase(search, info)
+        return False
+
     def getActionList(self, handle, case: int | UUID):
         result = list()
         if search := _findCase(self._handleList, handle, case):
@@ -110,6 +135,11 @@ class Execute(QtCore.QObject):
     def getActionInfo(self, handle, case: int | UUID, action: UUID):
         if search := _findAction(self._handleList, handle, case, action):
             return TestFactory.formatAction(search, True)
+
+    def setActionInfo(self, handle, case: int | UUID, action: UUID, info):
+        if search := _findAction(self._handleList, handle, case, action):
+            return TestFactory.updateAction(search, info)
+        return False
 
     def getErrorInfo(self):
         pass  # TODO

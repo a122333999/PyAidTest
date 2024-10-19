@@ -55,6 +55,12 @@ class TestActionOperate(TestAction):
 
         return TestResult(TestResult.CriticalFlag, "执行operate错误: 没有找到匹配的class")
 
+    def setClass(self, data):
+        if data in ["click", "leftClick", "rightClick", "doubleClick",
+                    "move", "drag", "wheel", "key", "keys", "copyPaste"]:
+            return super().setClass(data)
+        return False
+
     def setConfig(self, data):
         self._configPoint = _returnConfigsValue('point', data)
         self._configOffset = _returnConfigsValue('offset', data)
@@ -62,6 +68,7 @@ class TestActionOperate(TestAction):
         self._configKeys = _returnConfigsValue('keys', data)
         self._configRoll = _returnConfigsValue('roll', data)
         self._configContent = _returnConfigsValue('content', data)
+        return True
 
     def getConfig(self):
         return {

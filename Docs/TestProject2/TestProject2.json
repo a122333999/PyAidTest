@@ -8,8 +8,5 @@
     },
 
     "entry": [
-        {"path": "path/file.tg", "type": "test"},
-        {"path": "path/file.py", "type": "script"},
-        {"path": "path/file.dbc", "type": "resource"}
     ]
 }

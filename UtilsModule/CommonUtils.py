@@ -16,4 +16,12 @@ class CommonUtils:
 
         return False
 
+    @staticmethod
+    def strToBool(text: str, dft=False):
+        text = text.upper()
+        if text == "TRUE":
+            return True
+        elif text == "FALSE":
+            return False
+        return dft
 

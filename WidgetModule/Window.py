@@ -1,8 +1,11 @@
 import os
+
+from PySide6 import QtCore
 from PySide6.QtGui import Qt, QAction
 from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog
 from WidgetModule import Project as ProjectModule
 from WidgetModule import ExecuteManager
+from WidgetModule.LogWidget import LogInst as log
 from WidgetModule.DockWidget import DockWidget
 from WidgetModule.FileWidget.FileWidget import FileWidget
 from WidgetModule.BoxWidget.BoxWidget import BoxWidget
@@ -32,7 +35,11 @@ class MainWindow(QMainWindow):
         self._fileWidget = FileWidget()
         self._fileWidget.fileActivated.connect(self.onFileActivated)
         self._boxWidget = BoxWidget()
+        self._boxWidget.testNodeClicked.connect(self.onTestNodeClicked)
+        self._boxWidget.hintNodeClicked.connect(self.onHintNodeClicked)
+        self._boxWidget.currentPageChanged.connect(self.onCurrentPageChanged)
         self._attrWidget = AttrWidget()
+        self._attrWidget.attrModified.connect(self.onAttrModified)
         self._logWidget = LogWidget()
 
         dw = DockWidget()
@@ -48,8 +55,9 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self._menuBar)
 
         self.setWindowTitle("PyGuiTest")
-        self.resize(1000, 600)
+        self.resize(1200, 720)
 
+    @QtCore.Slot()
     def onFileNewAction(self):
         # 1确定目录和项目名称 2新建目录和输出项目文件
         path = QFileDialog.getExistingDirectory(self, "新建项目", "TestProject")
@@ -62,6 +70,7 @@ class MainWindow(QMainWindow):
 
         print("新建项目失败")
 
+    @QtCore.Slot()
     def onFileLoadAction(self):
         if not ProjectModule.isEmpty():
             print("已经打开了一个项目")
@@ -70,15 +79,38 @@ class MainWindow(QMainWindow):
         if len(file):
             self._loadProject(file)
 
+    @QtCore.Slot()
     def onFileSaveAction(self):
-        print("保存项目", self)
+        if path := ProjectModule.getProjectPath():
+            self._saveProject(path)
 
-    def onFileActivated(self, path):
-        # 判断是否为entry
-        if entry := ProjectModule.pathToEntry(path):
-            self._boxWidget.addTabPage(entry)
-        else:
-            self._boxWidget.addTabPageForFile(path)
+    @QtCore.Slot(str)
+    def onFileActivated(self, absPath):
+        self._boxWidget.addTabPage(absPath)
+
+    @QtCore.Slot(str, str, str)
+    def onTestNodeClicked(self, entry, caseIden, actionIden):
+        entry = entry if len(entry) else None
+        caseIden = caseIden if len(caseIden) else None
+        actionIden = actionIden if len(actionIden) else None
+        self._attrWidget.resetContent(entry, caseIden, actionIden)
+
+    @QtCore.Slot(str)
+    def onHintNodeClicked(self, entry):
+        self._attrWidget.clearContent()
+
+    @QtCore.Slot(str)
+    def onCurrentPageChanged(self, filePath):
+        self._attrWidget.clearContent()
+        if entry := ProjectModule.pathToEntry(filePath):
+            entryFile, entryType = entry
+            if entryType == "test":
+                self._attrWidget.resetContent(entryFile, None, None)
+
+    @QtCore.Slot()
+    def onAttrModified(self):
+        self._boxWidget.refreshTabPage()
+        pass
 
     def _loadProject(self, path):
         if not ProjectModule.load(path):
@@ -94,9 +126,18 @@ class MainWindow(QMainWindow):
                 return False
 
         self._attrWidget.clearContent()
-        self._boxWidget.clearContent()
+        self._boxWidget.clearTabPage()
         self._fileWidget.updateContent(ProjectModule.getProjectPath())
         return True
+
+    def _saveProject(self, path):
+        self.objectName()  # 无意义
+        ProjectModule.save(path)
+        for entryFile, entryType in ProjectModule.getTestEntryList():
+            if not ExecuteManager.save(entryFile):
+                log.error("保存失败")
+
+
 
 
 

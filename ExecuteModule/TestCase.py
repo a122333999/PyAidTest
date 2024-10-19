@@ -106,14 +106,17 @@ class TestCase(TestBase):
             return False
 
     def setStart(self, start):
-        if CommonUtils.checkUuid(start):
+        if CommonUtils.checkUuid(start) or start is None:
             self._start = start
+            return True
+        return False
 
     def getStart(self):
         return self._start
 
     def setActive(self, active: bool):
-        self._active = active
+        self._active = bool(active)
+        return True
 
     def getActive(self):
         return self._active

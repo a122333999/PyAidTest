@@ -17,6 +17,11 @@ class TestActionEmpty(TestAction):
             return self._empty()
         return TestResult(TestResult.CriticalFlag, "执行empty错误: 没有找到匹配的class")
 
+    def setClass(self, data):
+        if data in ['empty']:
+            return super().setClass(data)
+        return False
+
     def _empty(self):
         result = TestResult(TestResult.RunningFlag, "执行empty完成")
         result.setNext(self.getChild())

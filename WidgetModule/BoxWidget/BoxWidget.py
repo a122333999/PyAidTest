@@ -12,85 +12,102 @@ from WidgetModule.BoxWidget.BoxImageWidget import BoxImageWidget
 
 class BoxWidget(QWidget):
     # 当前页改变
+    # args: filePath
     currentPageChanged = QtCore.Signal(str)
+
+    # 测试文件的节点被点击
+    # args: entry
+    hintNodeClicked = QtCore.Signal(str)
+    # args: entry, caseIden, actionIden
+    testNodeClicked = QtCore.Signal(str, str, str)
 
     def __init__(self):
         super().__init__()
 
-        self._entryPage = set()
         self._filePage = set()
 
         self._tabWidget = QTabWidget()
         self._tabWidget.setTabsClosable(True)
         self._tabWidget.addTab(BoxHomeWidget(), "主页")
+        self._tabWidget.currentChanged.connect(self.onCurrentTabChanged)
         self._tabWidget.tabCloseRequested.connect(self.onTabCloseRequested)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.layout().addWidget(self._tabWidget)
 
-    def hasTabPage(self, entry):
-        pass
+    def addTabPage(self, absFilePath):
+        filePath = absFilePath
+        fileName = QFileInfo(absFilePath).fileName()
 
-    def addTabPage(self, entry):
-        entry0, entry1 = entry
-        if entry0 in self._entryPage:
-            self._changeCurrentPage(entry0)
+        # 是否已存在该文件的Tab
+        if filePath in self._filePage:
+            self._changeCurrentPage(filePath)
             return False
 
-        name = QFileInfo(entry0).fileName()
-        if entry1 == "test":
-            if ExecuteManager.load(entry0):
-                widget = BoxTestWidget(entry0)
-                widget.setProperty("iden", entry0)
-                self._entryPage.add(entry0)
-                self._tabWidget.addTab(widget, name)
+        if entry := ProjectModule.pathToEntry(filePath):
+            entryFile, entryType = entry
+            if entryType == "test":
+                widget = BoxTestWidget(entryFile)
+                widget.setProperty("filePath", filePath)
+                widget.nodeClicked.connect(self.onNoneClicked)
+                self._filePage.add(filePath)
+                self._tabWidget.addTab(widget, fileName)
                 self._tabWidget.setCurrentWidget(widget)
                 return True
-            else:
-                QMessageBox.critical(self, "错误", "文件打开失败")
-                return False
-        elif entry1 == "script":
-            widget = BoxEditWidget(entry0)
-            widget.setProperty("iden", entry0)
-            self._entryPage.add(entry0)
-            self._tabWidget.addTab(widget, name)
-            self._tabWidget.setCurrentWidget(widget)
-            return True
-        elif entry1 == "resource":
-            widget = BoxImageWidget(entry0)
-            widget.setProperty("iden", entry0)
-            self._entryPage.add(entry0)
-            self._tabWidget.addTab(widget, name)
+            elif entryType == "script":
+                widget = BoxEditWidget(entryFile)
+                widget.setProperty("filePath", filePath)
+                self._filePage.add(filePath)
+                self._tabWidget.addTab(widget, fileName)
+                self._tabWidget.setCurrentWidget(widget)
+                return True
+            elif entryType == "resource":
+                widget = BoxImageWidget(entryFile)
+                widget.setProperty("filePath", filePath)
+                self._filePage.add(filePath)
+                self._tabWidget.addTab(widget, fileName)
+                self._tabWidget.setCurrentWidget(widget)
+                return True
+        else:
+            widget = BoxImageWidget(filePath)
+            widget.setProperty("filePath", filePath)
+            self._filePage.add(filePath)
+            self._tabWidget.addTab(widget, fileName)
             self._tabWidget.setCurrentWidget(widget)
             return True
 
         return False
 
-    def addTabPageForFile(self, file):
-        if file in self._filePage:
-            self._changeCurrentPage(file)
-            return False
-
-        name = QFileInfo(file).fileName()
-        widget = BoxImageWidget(file)
-        widget.setProperty("iden", file)
-        self._filePage.add(file)
-        self._tabWidget.addTab(widget, name)
-        self._tabWidget.setCurrentWidget(widget)
-        return True
-
-    def clearContent(self):
+    def clearTabPage(self):
         pass
 
+    def refreshTabPage(self):
+        if widget := self._tabWidget.currentWidget():
+            if isinstance(widget, BoxTestWidget):
+                widget.refreshWidget()
+
+    @QtCore.Slot(int)
     def onTabCloseRequested(self, index):
         widget = self._tabWidget.widget(index)
-        self._filePage.discard(widget.property("iden"))
-        self._entryPage.discard(widget.property("iden"))
+        self._filePage.discard(widget.property("filePath"))
         self._tabWidget.removeTab(index)
 
-    def _changeCurrentPage(self, iden):
+    @QtCore.Slot()
+    def onCurrentTabChanged(self):
+        if widget := self._tabWidget.currentWidget():
+            filePath = widget.property("filePath")
+            self.currentPageChanged.emit(filePath)
+
+    @QtCore.Slot(str, str, str)
+    def onNoneClicked(self, entry, caseIden, actionIden):
+        if len(entry) and len(caseIden):
+            self.testNodeClicked.emit(entry, caseIden, actionIden)
+        elif len(entry):
+            self.hintNodeClicked.emit(entry)
+
+    def _changeCurrentPage(self, filePath):
         for index in range(self._tabWidget.count()):
             widget = self._tabWidget.widget(index)
-            if widget.property("iden") == iden:
+            if widget.property("filePath") == filePath:
                 self._tabWidget.setCurrentIndex(index)
                 break

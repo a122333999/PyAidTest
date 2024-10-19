@@ -6,6 +6,7 @@ from ExecuteModule.TestActionCheck import TestActionCheck
 from ExecuteModule.TestActionControl import TestActionControl
 from ExecuteModule.TestActionOperate import TestActionOperate
 from ExecuteModule.TestActionEmpty import TestActionEmpty
+from UtilsModule.CommonUtils import CommonUtils
 
 
 # TODO: 验证UUID是否有效
@@ -21,7 +22,8 @@ class TestFactory:
 
     @staticmethod
     def exportFile(path, data):
-        pass
+        data: dict = TestFactory.formatGroup(data, False)
+        return _writeFile(path, data)
 
     @staticmethod
     def parseGroup(data: dict, only=False):
@@ -52,6 +54,19 @@ class TestFactory:
             'desc': group.getDesc(),
             'cases': cases,
         }
+
+    @staticmethod
+    def updateGroup(group: TestGroup, data):
+        count = 2
+        if "name" in data:
+            val = data["name"]
+            if group.setName(val):
+                count -= 1
+        if "desc" in data:
+            val = data["desc"]
+            if group.setDesc(val):
+                count -= 1
+        return not bool(count)
 
     @staticmethod
     def parseCase(data: dict, only=False):
@@ -90,6 +105,27 @@ class TestFactory:
         }
 
     @staticmethod
+    def updateCase(case: TestCase, data):
+        count = 4
+        if "name" in data:
+            val = data["name"]
+            if case.setName(val):
+                count -= 1
+        if "desc" in data:
+            val = data["desc"]
+            if case.setDesc(val):
+                count -= 1
+        if "start" in data:
+            val = data["start"]
+            if case.setStart(val):
+                count -= 1
+        if "active" in data:
+            val = data["active"]
+            if case.setActive(val):
+                count -= 1
+        return not bool(count)
+
+    @staticmethod
     def parseAction(data: dict):
         if result := _createTestAction(data):
             result.setName(data['name'])
@@ -118,11 +154,58 @@ class TestFactory:
             'config': action.getConfig(),
         }
 
+    @staticmethod
+    def updateAction(action: TestAction, data):
+        count = 8
+        if "name" in data:
+            val = data["name"]
+            if action.setName(val):
+                count -= 1
+        if "desc" in data:
+            val = data["desc"]
+            if action.setDesc(val):
+                count -= 1
+        if "class" in data:
+            val = data['class']
+            if action.setClass(val):
+                count -= 1
+        if "delay" in data:
+            val = data['delay']
+            if action.setDelay(val):
+                count -= 1
+        if "times" in data:
+            val = data['times']
+            if action.setTimes(val):
+                count -= 1
+        if "retry" in data:
+            val = data["retry"]
+            if action.setRetry(val):
+                count -= 1
+        if "child" in data:
+            val = data["child"]
+            if action.setChild(val):
+                count -= 1
+        if "config" in data:
+            val = data['config']
+            if action.setConfig(val):
+                count -= 1
+        return not bool(count)
+
 
 def _readFile(path):
     try:
         with open(path, "rb") as fp:
             return json.load(fp)
+    except Exception as e:
+        print(path)
+        return e
+
+
+def _writeFile(path, data):
+    try:
+        with open(path, "w", encoding="utf8") as fp:
+            json.dump(data, fp, indent=4, ensure_ascii=False)
+            return True
     except Exception as e:
         return e
 

@@ -16,12 +16,18 @@ class TestBase(QObject):
     def setIden(self, iden):
         if CommonUtils.checkUuid(iden):
             self._iden = iden
+            return True
+        return False
 
     def setName(self, name):
-        self._name = name
+        if len(name):
+            self._name = name
+            return True
+        return False
 
     def setDesc(self, desc):
         self._desc = desc
+        return True
 
     def getIden(self):
         return self._iden
