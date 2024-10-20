@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from PySide6.QtCore import QDir
 from ExecuteModule.Execute import Execute
 

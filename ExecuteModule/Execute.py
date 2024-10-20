@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import pyautogui
 from uuid import UUID
 from PySide6 import QtCore

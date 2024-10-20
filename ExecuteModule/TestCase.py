@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import time
 from PySide6 import QtCore
 from ExecuteModule.TestBase import TestBase

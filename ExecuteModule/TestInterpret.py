@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from ExecuteModule.TestRuntime import TestRuntime
 from ExecuteModule.TestResult import TestResult
 from ExecuteModule.TestRect import TestRect

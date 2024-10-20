@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from PySide6.QtWidgets import QStyledItemDelegate, QLineEdit, QComboBox, QSpinBox
 from WidgetModule.AttrWidget import AttrDefine as AttrDef
 

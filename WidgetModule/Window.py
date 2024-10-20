@@ -1,9 +1,10 @@
-import os
+# -*- coding:utf-8 -*-
 
+import os
 from PySide6 import QtCore
 from PySide6.QtGui import Qt, QAction
 from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog, QToolBar
-from WidgetModule import Project as ProjectModule
+from WidgetModule import ProjectManager
 from WidgetModule import ExecuteManager
 from WidgetModule.LogWidget import LogInst as log
 from WidgetModule.DockWidget import DockWidget
@@ -32,10 +33,14 @@ class MainWindow(QMainWindow):
         self._runMenu = QMenu("Run")
         self._runRunAction = QAction("运行文件", self)
         self._runMenu.addAction(self._runRunAction)
+        self._helpMenu = QMenu("Help")
+        self._helpHomeAction = QAction("主页", self)
+        self._helpMenu.addAction(self._helpHomeAction)
         self._menuBar = QMenuBar()
         self._menuBar.setContentsMargins(0, 0, 0, 0)
         self._menuBar.addMenu(self._fileMenu)
         self._menuBar.addMenu(self._runMenu)
+        self._menuBar.addMenu(self._helpMenu)
 
         self._fileWidget = FileWidget()
         self._fileWidget.fileActivated.connect(self.onFileActivated)
@@ -64,7 +69,8 @@ class MainWindow(QMainWindow):
 
         self._toolBar = QToolBar(self)
         self._toolBar.addAction("AA")
-        self._menuBar.setCornerWidget(self._toolBar)
+        self._toolBar.setVisible(False)
+        # self._menuBar.setCornerWidget(self._toolBar)
 
         self.setWindowTitle("PyGuiTest")
         self.resize(1200, 720)
@@ -75,7 +81,7 @@ class MainWindow(QMainWindow):
         path = QFileDialog.getExistingDirectory(self, "新建项目", "TestProject")
         if len(path) == 0:
             return
-        if ret := ProjectModule.createProject(*os.path.split(path)):
+        if ret := ProjectManager.createProject(*os.path.split(path)):
             # TODO: 关闭现在的项目
             self._loadProject(ret)
             return
@@ -84,7 +90,7 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def onFileLoadAction(self):
-        if not ProjectModule.isEmpty():
+        if not ProjectManager.isEmpty():
             print("已经打开了一个项目")
             return
         file, _ = QFileDialog.getOpenFileName()
@@ -93,7 +99,7 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def onFileSaveAction(self):
-        if path := ProjectModule.getProjectPath():
+        if path := ProjectManager.getProjectPath():
             self._saveProject(path)
 
     @QtCore.Slot(str)
@@ -114,7 +120,7 @@ class MainWindow(QMainWindow):
     @QtCore.Slot(str)
     def onCurrentPageChanged(self, filePath):
         self._attrWidget.clearContent()
-        if entry := ProjectModule.pathToEntry(filePath):
+        if entry := ProjectManager.pathToEntry(filePath):
             entryFile, entryType = entry
             if entryType == "test":
                 self._attrWidget.resetContent(entryFile, None, None)
@@ -125,27 +131,27 @@ class MainWindow(QMainWindow):
         pass
 
     def _loadProject(self, path):
-        if not ProjectModule.load(path):
+        if not ProjectManager.load(path):
             print("项目打开失败")
             return False
 
-        if not ExecuteManager.init(ProjectModule.getProjectDirectory()):
+        if not ExecuteManager.init(ProjectManager.getProjectDirectory()):
             return False
 
-        for entry0, entry1 in ProjectModule.getTestEntryList():
+        for entry0, entry1 in ProjectManager.getTestEntryList():
             if not ExecuteManager.load(entry0):
                 # TODO: 打开失败时的清理
                 return False
 
         self._attrWidget.clearContent()
         self._boxWidget.clearTabPage()
-        self._fileWidget.updateContent(ProjectModule.getProjectPath())
+        self._fileWidget.updateContent(ProjectManager.getProjectPath())
         return True
 
     def _saveProject(self, path):
         self.objectName()  # 无意义
-        ProjectModule.save(path)
-        for entryFile, entryType in ProjectModule.getTestEntryList():
+        ProjectManager.save(path)
+        for entryFile, entryType in ProjectManager.getTestEntryList():
             if not ExecuteManager.save(entryFile):
                 log.error("保存失败")
 

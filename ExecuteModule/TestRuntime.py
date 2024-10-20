@@ -1,4 +1,4 @@
-from ExecuteModule.TestInput import TestInput
+# -*- coding:utf-8 -*-
 
 
 class TestRuntime:

@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import uuid
 from PySide6.QtCore import QObject
 from UtilsModule.CommonUtils import CommonUtils

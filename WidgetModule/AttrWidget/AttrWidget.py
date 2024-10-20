@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from PySide6 import QtCore
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QWidget, QTreeWidget, QVBoxLayout

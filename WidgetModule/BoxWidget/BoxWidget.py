@@ -1,8 +1,10 @@
+# -*- coding:utf-8 -*-
+
 from PySide6 import QtCore
 from PySide6.QtCore import QFileInfo
-from PySide6.QtWidgets import QVBoxLayout, QMessageBox
+from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget, QTabWidget
-from WidgetModule import Project as ProjectModule
+from WidgetModule import ProjectManager
 from WidgetModule import ExecuteManager
 from WidgetModule.BoxWidget.BoxHomeWidget import BoxHomeWidget
 from WidgetModule.BoxWidget.BoxTestWidget import BoxTestWidget
@@ -44,7 +46,7 @@ class BoxWidget(QWidget):
             self._changeCurrentPage(filePath)
             return False
 
-        if entry := ProjectModule.pathToEntry(filePath):
+        if entry := ProjectManager.pathToEntry(filePath):
             entryFile, entryType = entry
             if entryType == "test":
                 widget = BoxTestWidget(entryFile)

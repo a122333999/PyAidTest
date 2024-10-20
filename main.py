@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 import sys
 import time
 import uuid
@@ -30,8 +32,6 @@ if __name__ == '__main__':
 
     handle = execute.load("./Docs/test1.json")
     print(handle)
-
-
 
     app = QApplication(sys.argv)
     window = MainWindow()

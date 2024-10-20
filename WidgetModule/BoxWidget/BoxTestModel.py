@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+
 from PySide6.QtCore import QAbstractItemModel, Qt, QModelIndex
 from WidgetModule import ExecuteManager
 

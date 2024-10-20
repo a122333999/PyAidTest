@@ -3,6 +3,8 @@ from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QWidget, QLabel, QTreeView, QVBoxLayout
 from WidgetModule import ExecuteManager
 from WidgetModule.LogWidget import LogInst as log
+# -*- coding:utf-8 -*-
+
 from WidgetModule.BoxWidget.BoxTestModel import BoxTestModel
 
 

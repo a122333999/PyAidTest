@@ -1,59 +1,14 @@
+# -*- coding:utf-8 -*-
+
 import json
-from PySide6.QtCore import QDir, QFileInfo
-
-
-# TODO: 打开任意文件都成功
-
-
-def load(file):
-    return _projectObj.load(file)
-
-
-def save(file):
-    return _projectObj.save(file)
-
-
-def isEmpty():
-    return _projectObj.isEmpty()
-
-
-def getEntryList():
-    return _projectObj.getEntryList()
-
-
-def getTestEntryList():
-    return _projectObj.getTestEntryList()
-
-
-def getScriptEntryList():
-    return _projectObj.getScriptEntryList()
-
-
-def getResourceEntryList():
-    return _projectObj.getResourceEntryList()
-
-
-def pathToEntry(path):
-    return _projectObj.pathToEntry(path)
-
-
-def getProjectPath():
-    return _projectObj.getProjectPath()
-
-
-def getProjectDirectory():
-    return _projectObj.getProjectDirectory()
-
-
-def instance():
-    return _projectObj
-
-
-def createProject(path, name):
-    return _projectObj.createProject(path, name)
+from PySide6.QtCore import QFileInfo, QDir
+from ProjectModule import ProjectTemplate
 
 
 class Project:
+
+    # 项目文件扩展名
+    _ext = ".json"
 
     def __init__(self):
         self._path = None
@@ -65,14 +20,15 @@ class Project:
                 self._data = json.load(fp)
                 self._path = QFileInfo(file).absoluteFilePath()
                 return True
+            pass
         except Exception as e:
             print("打开项目文件失败", e)
             return False
 
     def save(self, file):
         try:
-            with open(file, 'w') as fp:
-                json.dump(self._data, fp)
+            with open(file, 'w', encoding="utf8") as fp:
+                json.dump(self._data, fp, indent=4, ensure_ascii=False)
         except Exception as e:
             print("保存项目文件失败", e)
             return False
@@ -146,10 +102,6 @@ class Project:
         return QFileInfo(self._path).absolutePath()
 
     @classmethod
-    def instance(cls):
-        return _projectObj
-
-    @classmethod
     def createProject(cls, path, name):
         qtDir = QDir(path)
         # 当前目录不存在则创建
@@ -165,11 +117,11 @@ class Project:
         if not qtDir.cd(name):
             return None
         # 把项目模板写入文件
-        with open(qtDir.filePath(name + _projectExt), 'w') as fp:
-            if fp.write(_projectTemp) != len(_projectTemp):
+        with open(qtDir.filePath(name + cls._ext), 'w', encoding="utf8") as fp:
+            if fp.write(ProjectTemplate.get()) != len(ProjectTemplate.get()):
                 return None
         # 验证是否成功
-        info = QFileInfo(qtDir.filePath(name + _projectExt))
+        info = QFileInfo(qtDir.filePath(name + cls._ext))
         if info.exists():
             return info.absoluteFilePath()
 
@@ -179,17 +131,3 @@ class Project:
                 if item["file"] == entry:
                     return True
         return False
-
-
-_projectObj = Project()
-_projectExt = ".json"
-_projectTemp = \
-"""
-{
-    "info": {
-         "version": 0,
-         "prefix": {}
-    },
-    "entry": []
-}
-"""
