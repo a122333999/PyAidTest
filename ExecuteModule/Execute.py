@@ -52,6 +52,7 @@ class Execute(QtCore.QObject):
         return 0
 
     def unload(self, handle):
+        # TODO: 判断运行状态 其他函数也是
         self._handleList.pop(handle)
         self._handlePath.pop(handle)
 

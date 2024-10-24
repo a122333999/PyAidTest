@@ -7,6 +7,7 @@ from ProjectModule.Project import Project
 
 
 _projectObj = Project()
+_projectModified = False
 
 
 def load(file):
@@ -19,9 +20,24 @@ def save(file):
     return _projectObj.save(file)
 
 
+def clear():
+    global _projectObj
+    _projectObj = Project()
+
+
 def isEmpty():
     global _projectObj
     return _projectObj.isEmpty()
+
+
+def isModified():
+    global _projectModified
+    return _projectModified
+
+
+def setModified(flag):
+    global _projectModified
+    _projectModified = flag
 
 
 def getEntryList():
@@ -63,5 +79,7 @@ def createProject(path, name):
     return Project.createProject(path, name)
 
 
+def addObserver(name, func):
+    pass
 
 

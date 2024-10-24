@@ -1,16 +1,17 @@
 # -*- coding:utf-8 -*-
 
 import json
-from PySide6.QtCore import QFileInfo, QDir
+from PySide6.QtCore import QFileInfo, QDir, QObject
 from ProjectModule import ProjectTemplate
 
 
-class Project:
+class Project(QObject):
 
     # 项目文件扩展名
     _ext = ".json"
 
     def __init__(self):
+        super().__init__()
         self._path = None
         self._data = None
 
@@ -23,15 +24,16 @@ class Project:
             pass
         except Exception as e:
             print("打开项目文件失败", e)
-            return False
+        return False
 
     def save(self, file):
         try:
             with open(file, 'w', encoding="utf8") as fp:
                 json.dump(self._data, fp, indent=4, ensure_ascii=False)
+                return True
         except Exception as e:
             print("保存项目文件失败", e)
-            return False
+        return False
 
     def isEmpty(self):
         return self._path is None or self._data is None
@@ -108,11 +110,11 @@ class Project:
         if not qtDir.exists():
             qtDir.mkpath(path)
         # # 项目目录已存在
-        # if qtDir.exists(name):
-        #     return None
+        if qtDir.exists(name):
+            return None
         # # 创建项目目录失败
-        # if not qtDir.mkdir(name):
-        #     return None
+        if not qtDir.mkdir(name):
+            return None
         # 进入项目目录失败
         if not qtDir.cd(name):
             return None

@@ -1,9 +1,8 @@
 # -*- coding:utf-8 -*-
 
-import os
 from PySide6 import QtCore
 from PySide6.QtGui import Qt, QAction
-from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog, QToolBar
+from PySide6.QtWidgets import QMainWindow, QMenuBar, QMenu, QFileDialog, QToolBar, QMessageBox
 from WidgetModule import ProjectManager
 from WidgetModule import ExecuteManager
 from WidgetModule.LogWidget import LogInst as log
@@ -12,6 +11,7 @@ from WidgetModule.FileWidget.FileWidget import FileWidget
 from WidgetModule.BoxWidget.BoxWidget import BoxWidget
 from WidgetModule.AttrWidget.AttrWidget import AttrWidget
 from WidgetModule.LogWidget.LogWidget import LogWidget
+from WidgetModule.ZzzWidget.NewProjectDialog import NewProjectDialog
 
 
 class MainWindow(QMainWindow):
@@ -77,30 +77,43 @@ class MainWindow(QMainWindow):
 
     @QtCore.Slot()
     def onFileNewAction(self):
-        # 1确定目录和项目名称 2新建目录和输出项目文件
-        path = QFileDialog.getExistingDirectory(self, "新建项目", "TestProject")
-        if len(path) == 0:
-            return
-        if ret := ProjectManager.createProject(*os.path.split(path)):
-            # TODO: 关闭现在的项目
-            self._loadProject(ret)
+        # 1处理当前项目
+        if ProjectManager.isModified():
+            ret = QMessageBox.question(self, "提示", "当前工程未保存, 是否保存?")
+            if ret == QMessageBox.StandardButton.Yes:
+                if not self._saveProject():
+                    return
+
+        # 2新项目的位置
+        path, name = NewProjectDialog(self).exec()
+        if path is None or name is None:
             return
 
-        print("新建项目失败")
+        # 3创建项目/清理项目/加载项目
+        if ret := ProjectManager.createProject(path, name):
+            self._clearProject()
+            self._loadProject(ret)
+            return
+        log.error("新建项目失败")
 
     @QtCore.Slot()
     def onFileLoadAction(self):
-        if not ProjectManager.isEmpty():
-            print("已经打开了一个项目")
-            return
+        # 1处理当前项目 2加载项目
+        if ProjectManager.isModified():
+            ret = QMessageBox.question(self, "提示", "当前工程未保存, 是否保存?")
+            if ret == QMessageBox.StandardButton.Yes:
+                if not self._saveProject():
+                    return
+
         file, _ = QFileDialog.getOpenFileName()
         if len(file):
-            self._loadProject(file)
+            self._clearProject()
+            if not self._loadProject(file):
+                log.error("加载项目失败")
 
     @QtCore.Slot()
     def onFileSaveAction(self):
-        if path := ProjectManager.getProjectPath():
-            self._saveProject(path)
+        self._saveProject()
 
     @QtCore.Slot(str)
     def onFileActivated(self, absPath):
@@ -130,30 +143,51 @@ class MainWindow(QMainWindow):
         self._boxWidget.refreshTabPage()
         pass
 
-    def _loadProject(self, path):
-        if not ProjectManager.load(path):
-            print("项目打开失败")
+    def _loadProject(self, absPath):
+        if not ProjectManager.load(absPath):
+            log.error("加载项目失败")
             return False
-
         if not ExecuteManager.init(ProjectManager.getProjectDirectory()):
+            log.error("加载项目失败")
             return False
-
-        for entry0, entry1 in ProjectManager.getTestEntryList():
-            if not ExecuteManager.load(entry0):
-                # TODO: 打开失败时的清理
+        for entryFile, entryType in ProjectManager.getTestEntryList():
+            if not ExecuteManager.load(entryFile):
+                ExecuteManager.uninit()
+                ProjectManager.clear()
+                log.error("加载项目失败")
                 return False
-
-        self._attrWidget.clearContent()
-        self._boxWidget.clearTabPage()
-        self._fileWidget.updateContent(ProjectManager.getProjectPath())
+        if absPath != ProjectManager.getProjectPath():
+            log.error("加载项目失败")
+            return False
+        self._fileWidget.updateContent(absPath)
+        log.info("加载项目成功")
         return True
 
-    def _saveProject(self, path):
+    def _saveProject(self):
         self.objectName()  # 无意义
-        ProjectManager.save(path)
-        for entryFile, entryType in ProjectManager.getTestEntryList():
-            if not ExecuteManager.save(entryFile):
-                log.error("保存失败")
+        if path := ProjectManager.getProjectPath():
+            for entryFile, entryType in ProjectManager.getTestEntryList():
+                if not ExecuteManager.save(entryFile):
+                    log.error("项目保存失败")
+                    return False
+            if not ProjectManager.save(path):
+                log.info("项目保存成功")
+                return True
+        log.error("项目保存失败")
+        return False
+
+    def _clearProject(self):
+        # 1清理控件 2清理测试文件 3清理工程文件
+        self._attrWidget.clearContent()
+        self._boxWidget.clearTabPage()
+        self._fileWidget.clearContent()
+        ExecuteManager.uninit()
+        ProjectManager.clear()
+
+
+
+
+
 
 
 

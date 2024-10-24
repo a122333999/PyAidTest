@@ -81,7 +81,9 @@ class BoxWidget(QWidget):
         return False
 
     def clearTabPage(self):
-        pass
+        self._tabWidget.clear()
+        self._filePage.clear()
+        self._tabWidget.addTab(BoxHomeWidget(), "主页")
 
     def refreshTabPage(self):
         if widget := self._tabWidget.currentWidget():

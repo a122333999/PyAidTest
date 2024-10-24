@@ -131,8 +131,8 @@ def init(execPath=""):
 def uninit():
     global _executeObj, _executeDir, _executeDict
     _executeDir = QDir.current()
-    for item in _executeDict:
-        _executeObj.unload(item)
+    for entry in _executeDict:
+        _executeObj.unload(_executeDict[entry])
     _executeDict.clear()
 
 
@@ -152,8 +152,9 @@ def load(entry):
 
 def unload(entry):
     global _executeObj, _executeDict
-    _executeObj.unload(_executeDict["entry"])
-    _executeDict.pop("entry")
+    if entry in _executeDict:
+        _executeObj.unload(_executeDict[entry])
+        _executeDict.pop(entry)
 
 
 def save(entry):
