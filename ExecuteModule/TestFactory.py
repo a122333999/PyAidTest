@@ -19,7 +19,7 @@ class TestFactory:
     def importFile(path):
         data: dict = _readFile(path)
         if isinstance(data, Exception):
-            raise data
+            return None
         return TestFactory.parseGroup(data)
 
     @staticmethod

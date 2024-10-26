@@ -21,7 +21,7 @@ class TestInterpret:
                 return cls._fn100(content, ret, idx, offset)
 
         elif "uuid:" in content:
-            if ret := TestRuntime.historyResult.get(_extractUuid(content[5:]), None):
+            if ret := TestRuntime.historyResult.getPt(_extractUuid(content[5:]), None):
                 return cls._fn100(content, ret, idx, offset)
 
         elif "user:" in content:
@@ -49,7 +49,7 @@ class TestInterpret:
             ret = TestRuntime.currentResult
             fun = _extractLambda(content[5:], defaultLambda)
         elif "uuid:" in content:
-            ret = TestRuntime.historyResult.get(_extractUuid(content[5:]), None)
+            ret = TestRuntime.historyResult.getPt(_extractUuid(content[5:]), None)
             fun = _extractLambda(content[content.find(".")+1:], defaultLambda)
 
         return fun, ret
@@ -64,7 +64,7 @@ class TestInterpret:
             if ret := TestRuntime.currentResult:
                 result = ret.getImages()
         elif "uuid:" in content:
-            if ret := TestRuntime.historyResult.get(_extractUuid(content[5:]), None):
+            if ret := TestRuntime.historyResult.getPt(_extractUuid(content[5:]), None):
                 result = ret.getImages()
 
         if len(result):

@@ -47,7 +47,7 @@ class BoxWidget(QWidget):
             return False
 
         if entry := ProjectManager.pathToEntry(filePath):
-            entryFile, entryType = entry
+            entryFile, entryType = ProjectManager.getEntryInfo(entry)
             if entryType == "test":
                 widget = BoxTestWidget(entryFile)
                 widget.setProperty("filePath", filePath)
@@ -79,6 +79,15 @@ class BoxWidget(QWidget):
             return True
 
         return False
+
+    def closeTabPage(self, absFilePath):
+        if absFilePath not in self._filePage:
+            return
+        for index in range(self._tabWidget.count()):
+            widget = self._tabWidget.widget(index)
+            if widget.property("filePath") == absFilePath:
+                self._tabWidget.removeTab(index)
+                break
 
     def clearTabPage(self):
         self._tabWidget.clear()

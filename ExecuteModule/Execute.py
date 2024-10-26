@@ -157,26 +157,26 @@ class Execute(QtCore.QObject):
     @QtCore.Slot(dict)
     def onCaseStatusChanged(self, data):
         status, schedule = StoppedStatus, Test1None
-        if data.get('flag') == TestResult.NoneFlag:
+        if data.getPt('flag') == TestResult.NoneFlag:
             status, schedule = StoppedStatus, Test1None
-        elif data.get('flag') == TestResult.FailedFlag:
+        elif data.getPt('flag') == TestResult.FailedFlag:
             status, schedule = StoppedStatus, Test1Failed
-        elif data.get('flag') == TestResult.FinishedFlag:
+        elif data.getPt('flag') == TestResult.FinishedFlag:
             status, schedule = StoppedStatus, Test1Finished
-        elif data.get('flag') == TestResult.CriticalFlag:
+        elif data.getPt('flag') == TestResult.CriticalFlag:
             status, schedule = StoppedStatus, Test1Error
-        elif data.get('flag') == TestResult.RunningFlag:
+        elif data.getPt('flag') == TestResult.RunningFlag:
             status, schedule = RunningStatus, Test1Next
-        elif data.get('flag') == TestResult.ErrorFlag:
+        elif data.getPt('flag') == TestResult.ErrorFlag:
             status, schedule = RunningStatus, Test1Error
-        elif data.get('flag') == TestResult.InputtingFlag:
+        elif data.getPt('flag') == TestResult.InputtingFlag:
             status, schedule = WaitingStatus, Test1Input
 
         self.execSignal.emit({
             'status': status,
             'schedule': schedule,
-            'iden': data.get('iden', None),
-            'msgs': data.get('msg', None),
+            'iden': data.getPt('iden', None),
+            'msgs': data.getPt('msg', None),
             'error': None
         })
 

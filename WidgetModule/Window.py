@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         self._fileMenu.addSeparator()
         self._fileMenu.addAction("关闭", lambda: self.close())
         self._runMenu = QMenu("Run")
-        self._runRunAction = QAction("运行文件", self)
+        self._runRunAction = QAction("运行", self)
         self._runMenu.addAction(self._runRunAction)
         self._helpMenu = QMenu("Help")
         self._helpHomeAction = QAction("主页", self)
@@ -72,8 +72,13 @@ class MainWindow(QMainWindow):
         self._toolBar.setVisible(False)
         # self._menuBar.setCornerWidget(self._toolBar)
 
-        self.setWindowTitle("PyGuiTest")
+        self.setWindowTitle("PyAidTest [*]")
         self.resize(1200, 720)
+
+        ProjectManager.addObserver("MainWindow", self.projectCallback)
+
+    def __del__(self):
+        ProjectManager.rmvObserver("MainWindow")
 
     @QtCore.Slot()
     def onFileNewAction(self):
@@ -119,6 +124,10 @@ class MainWindow(QMainWindow):
     def onFileActivated(self, absPath):
         self._boxWidget.addTabPage(absPath)
 
+    @QtCore.Slot(str)
+    def onFileDeleted(self, absPath):
+        self._boxWidget.closeTabPage(absPath)
+
     @QtCore.Slot(str, str, str)
     def onTestNodeClicked(self, entry, caseIden, actionIden):
         entry = entry if len(entry) else None
@@ -134,7 +143,7 @@ class MainWindow(QMainWindow):
     def onCurrentPageChanged(self, filePath):
         self._attrWidget.clearContent()
         if entry := ProjectManager.pathToEntry(filePath):
-            entryFile, entryType = entry
+            entryFile, entryType = ProjectManager.getEntryInfo(entry)
             if entryType == "test":
                 self._attrWidget.resetContent(entryFile, None, None)
 
@@ -143,20 +152,36 @@ class MainWindow(QMainWindow):
         self._boxWidget.refreshTabPage()
         pass
 
+    def projectCallback(self, event, data):
+        if event == ProjectManager.ProjectModifiedEvent:
+            self.setWindowModified(data["modified"])
+
+    def closeEvent(self, event):
+        if ProjectManager.isModified():
+            btn = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No | QMessageBox.StandardButton.Cancel
+            ret = QMessageBox.question(self, "是否保存项目", "项目已修改, 是否保存", btn)
+            if ret == QMessageBox.StandardButton.Yes:
+                if not self._saveProject():
+                    event.ignore()
+                    return
+            elif ret == QMessageBox.StandardButton.Cancel:
+                event.ignore()
+                return
+        super().closeEvent(event)
+
     def _loadProject(self, absPath):
         if not ProjectManager.load(absPath):
             log.error("加载项目失败")
             return False
-        if not ExecuteManager.init(ProjectManager.getProjectDirectory()):
+        if not ExecuteManager.init(ProjectManager.getProjectDirPath()):
             log.error("加载项目失败")
             return False
         for entryFile, entryType in ProjectManager.getTestEntryList():
             if not ExecuteManager.load(entryFile):
-                ExecuteManager.uninit()
-                ProjectManager.clear()
-                log.error("加载项目失败")
-                return False
-        if absPath != ProjectManager.getProjectPath():
+                ProjectManager.rmvEntry(entryFile)
+                ProjectManager.setModified(True)
+                log.error(f"加载测试文件失败: {entryFile}")
+        if absPath != ProjectManager.getProjectFilePath():
             log.error("加载项目失败")
             return False
         self._fileWidget.updateContent(absPath)
@@ -165,16 +190,17 @@ class MainWindow(QMainWindow):
 
     def _saveProject(self):
         self.objectName()  # 无意义
-        if path := ProjectManager.getProjectPath():
+        if path := ProjectManager.getProjectFilePath():
+            if not ProjectManager.save(path):
+                log.error("项目保存失败")
+                return False
             for entryFile, entryType in ProjectManager.getTestEntryList():
                 if not ExecuteManager.save(entryFile):
-                    log.error("项目保存失败")
+                    log.error(f"测试文件保存失败: {entryFile}")
                     return False
-            if not ProjectManager.save(path):
-                log.info("项目保存成功")
-                return True
-        log.error("项目保存失败")
-        return False
+        ProjectManager.setModified(False)
+        log.info("项目保存成功")
+        return True
 
     def _clearProject(self):
         # 1清理控件 2清理测试文件 3清理工程文件

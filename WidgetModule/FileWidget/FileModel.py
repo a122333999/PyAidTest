@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QFileIconProvider
 """
 ModelNode {
     icon: None
-    type: "file|dir"
+    type: "file|dir|root"
     data:["第一列", "第二列", ...]
     parent: ModelNode
     children: [ModelNode, ModelNode, ...]
@@ -19,7 +19,7 @@ class FileModel(QAbstractItemModel):
 
     def __init__(self):
         super().__init__()
-        self._root = {"icon": None, "type": "dir", "data": [""], "parent": None, "children": [], "absolute": ""}
+        self._root = {"icon": None, "type": "root", "data": [""], "parent": None, "children": [], "absolute": ""}
         # self._root["children"].append({"data": ["数据"], "parent": self._root, "children": []})
         # self._root["children"].append({"data": ["数据"], "parent": self._root, "children": []})
 
@@ -31,6 +31,11 @@ class FileModel(QAbstractItemModel):
         if qtDir.exists():
             self._root["children"] = _recursiveDirectory(qtDir, self._root)
         self.endResetModel()
+
+    def getIndexItem(self, index):
+        if index.isValid():
+            return index.internalPointer()
+        return self._root
 
     def index(self, row, column, parent=None):
         if not super().hasIndex(row, column, parent):

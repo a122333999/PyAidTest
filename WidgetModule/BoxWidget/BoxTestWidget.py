@@ -1,11 +1,25 @@
+# -*- coding:utf-8 -*-
+
 from PySide6 import QtCore
 from PySide6.QtCore import QModelIndex
 from PySide6.QtWidgets import QWidget, QLabel, QTreeView, QVBoxLayout
 from WidgetModule import ExecuteManager
 from WidgetModule.LogWidget import LogInst as log
-# -*- coding:utf-8 -*-
-
 from WidgetModule.BoxWidget.BoxTestModel import BoxTestModel
+
+
+"""
+添加测试用例
+删除测试用例
+添加动作到头部
+添加动作到末尾
+
+插入动作
+插入跳转
+删除动作
+
+
+"""
 
 
 class BoxTestWidget(QWidget):
