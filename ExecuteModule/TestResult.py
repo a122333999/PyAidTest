@@ -32,7 +32,7 @@ class TestResult:
 
     def __init__(self, flags, msg):
         super().__init__()
-        self._next = None
+        self._next = None  # 这项可能被删
         self._flags = int(flags)
         self._rects = list()
         self._images = list()

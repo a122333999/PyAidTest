@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         self._menuBar.addMenu(self._helpMenu)
 
         self._fileWidget = FileWidget()
+        self._fileWidget.fileDeleted.connect(self.onFileDeleted)
         self._fileWidget.fileActivated.connect(self.onFileActivated)
         self._boxWidget = BoxWidget()
         self._boxWidget.testNodeClicked.connect(self.onTestNodeClicked)

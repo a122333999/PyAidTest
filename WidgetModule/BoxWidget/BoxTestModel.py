@@ -7,9 +7,8 @@ from WidgetModule import ExecuteManager
 """
 ModelNode {
     icon: None
-    info: TestInfo
     type: "case|action|hint|sep"
-    title: None
+    info: TestInfo
     parent: ModelNode
     children: [ModelNode, ModelNode, ...]
     addition: {caseIden, actionIden}
@@ -29,14 +28,6 @@ class BoxTestModel(QAbstractItemModel):
         self.beginResetModel()
         _generateCase(iden, self._root)
         self.endResetModel()
-
-    def getCaseAndActionIden(self, index):
-        self.__str__()
-        if index.isValid():
-            if node := index.internalPointer():
-                if addition := node.get("addition", None):
-                    return addition.get("caseIden", None), addition.get("actionIden", None)
-        return None, None
 
     def index(self, row, column, parent=None):
         if not super().hasIndex(row, column, parent):
@@ -100,11 +91,12 @@ class BoxTestModel(QAbstractItemModel):
             result.append("")
             result.append("")
         elif node["type"] == "hint":
-            result.append(node["title"])
+            result.append(node["info"])
             result.append("")
             result.append("")
             result.append("")
-        elif info := node.get("info", None):
+        elif isinstance(node["info"], dict):
+            info = node["info"]
             keys = {
                 "case": "测试用例",
                 "check": "检查动作",
@@ -182,9 +174,8 @@ def _generateAction(iden, actionSet, parent):
 def _createCaseNode(info, parent):
     result = {
         "icon": None,
-        "info": info,
         "type": "case",
-        "title": None,
+        "info": info,
         "parent": parent,
         "children": [],
         "addition": {
@@ -199,9 +190,8 @@ def _createCaseNode(info, parent):
 def _createActionNode(info, parent):
     result = {
         "icon": None,
-        "info": info,
         "type": "action",
-        "title": None,
+        "info": info,
         "parent": parent,
         "children": [],
         "addition": {
@@ -216,9 +206,8 @@ def _createActionNode(info, parent):
 def _createSepNone(parent):
     result = {
         "icon": None,
-        "info": None,
         "type": "sep",
-        "title": "",
+        "info": "",
         "parent": parent,
         "children": [],
         "addition": {
@@ -233,9 +222,8 @@ def _createSepNone(parent):
 def _createHintNone(title, parent):
     result = {
         "icon": None,
-        "info": None,
         "type": "hint",
-        "title": title,
+        "info": title,
         "parent": parent,
         "children": [],
         "addition": {
