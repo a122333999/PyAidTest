@@ -25,12 +25,8 @@ def testSlot(info: dict):
     print(info)
 
 
-
-
-
-
-
 if __name__ == '__main__':
+
     execute = Execute()
     execute.execSignal.connect(testSlot)
 
