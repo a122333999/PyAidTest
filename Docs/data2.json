@@ -76,17 +76,18 @@
 					}
 				},
 				{
-					"type": "empty",
+					"type": "style",
 					"iden": "UUID",
 					"name": "空节点",
 					"desc": "空白节点",
 
-					"class": "empty",
+					"class": "empty(空节点)|sequence(序列)",
 					"delay": 1000,
 					"times": 1,
 					"force": true,
 					"valid": null,
 					"config": {
+						"children": []
 					}
 				}
 			]
