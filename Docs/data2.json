@@ -63,7 +63,7 @@
 					"name": "如果找到目标",
 					"desc": ".......",
 
-					"class": "if(条件)|for(循环)|input(输入)|finished(完成)|failed(失败)|script(脚本)",
+					"class": "if(条件)|for(循环)|input(输入)|pause(暂停)|assert(断言)|finished(完成)|failed(失败)|script(脚本)",
 					"delay": 1000,
 					"times": 1,
 					"force": true,
