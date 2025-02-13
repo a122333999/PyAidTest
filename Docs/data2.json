@@ -1,5 +1,5 @@
 {
-	"type": "group",
+	"type": "file",
 	"iden": "UUID",
 	"name": "测试TransmitPage",
 	"desc": "测试TransmitPage的测试组",
