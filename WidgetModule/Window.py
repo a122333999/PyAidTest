@@ -15,6 +15,7 @@ from WidgetModule.ZzzWidget.NewProjectDialog import NewProjectDialog
 
 
 class MainWindow(QMainWindow):
+    
     def __init__(self):
         super().__init__()
 

@@ -33,8 +33,8 @@ if __name__ == '__main__':
 
     # print(pyautogui.locateOnScreen('./Docs/testimg1.png'))
 
-    handle = execute.load("./Docs/test1.json")
-    print(handle)
+    # handle = execute.load("./Docs/test2.json")
+    # print(handle)
 
     app = QApplication(sys.argv)
     window = MainWindow()

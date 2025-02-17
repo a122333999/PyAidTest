@@ -8,5 +8,9 @@
     },
 
     "entry": [
+          {
+               "file": "Test/test2.json",
+               "type": "test"
+          }
     ]
 }

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from PySide6.QtCore import QDir
-from ExecuteModule.Execute import Execute
+from ExecuteModule2.Execute import Execute
 
 
 """
@@ -22,8 +22,8 @@ from ExecuteModule.Execute import Execute
     baseName: str(测试用例名称);
     baseDesc: str(测试用例描述);
     
-    caseStart: str(UUID)|None;
-    caseActive: bool(启用);
+    caseTimes: int(测试次数);
+    caseActive: bool(启用测试);
 }
 
 -- Empty Action 空动作
@@ -36,11 +36,11 @@ from ExecuteModule.Execute import Execute
     actionClass: str(分类);
     actionDelay: int(延时);
     actionTimes: int(次数);
-    actionRetry: int(重试);
-    actionChild: str(UUID)|None;
+    actionForce: bool(强制);
+    actionValid: bool(有效);
 }
 
--- Check Action 测试动作
+-- Search Action 测试动作
 {
     baseType: str(check);
     baseIden: str(UUID);

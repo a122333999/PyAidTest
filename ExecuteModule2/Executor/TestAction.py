@@ -3,7 +3,11 @@
 from ExecuteModule2.Executor.TestBase import TestBase
 from UtilsModule.CommonUtils import CommonUtils
 
-print("TestAction")
+emptyActionClass = None
+searchActionClass = None
+operateActionClass = None
+controlActionClass = None
+
 
 class TestAction(TestBase):
 
@@ -13,11 +17,6 @@ class TestAction(TestBase):
     actionForceKey = 'force'
     actionValidKey = 'valid'
     actionConfigKey = 'config'
-
-    emptyAction = None
-    searchAction = None
-    operateAction = None
-    controlAction = None
 
     def __init__(self):
         super().__init__()
@@ -29,7 +28,7 @@ class TestAction(TestBase):
     @classmethod
     def validJson(cls, data: dict, onlyHeader=True):
         if subActionCls := _returnSubAction(data):
-            return subActionCls.copyData(data, onlyHeader)
+            return subActionCls.validJson(data, onlyHeader)
         return False
 
     @classmethod
@@ -47,14 +46,14 @@ class TestAction(TestBase):
 
 def _returnSubAction(testAction):
     at = testAction[TestAction.baseTypeKey]
-    if TestAction.emptyAction and TestAction.emptyAction.classValue == at:
-        return TestAction.emptyAction
-    elif TestAction.searchAction and TestAction.searchAction.classValue == at:
-        return TestAction.searchAction
-    elif TestAction.operateAction and TestAction.operateAction.classValue == at:
-        return TestAction.operateAction
-    elif TestAction.controlAction and TestAction.controlAction.classValue == at:
-        return TestAction.controlAction
+    if emptyActionClass and emptyActionClass.typeValue == at:
+        return emptyActionClass
+    elif searchActionClass and searchActionClass.typeValue == at:
+        return searchActionClass
+    elif operateActionClass and operateActionClass.typeValue == at:
+        return operateActionClass
+    elif controlActionClass and controlActionClass.typeValue == at:
+        return controlActionClass
     else:
         return None
     

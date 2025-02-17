@@ -1,8 +1,23 @@
 # -*- coding:utf-8 -*-
 import json
+import pyautogui
 from ExecuteModule2.Executor.TestFactory import TestFactory
 
-print("Execute")
+""" 状态 """
+StoppedStatus = 0
+RunningStatus = 1
+WaitingStatus = 2
+
+""" 流程 """
+Test1None = 0
+Test1Failed = 1
+Test1Finished = 2
+Test1Next = 3
+Test1Input = 4
+Test1Error = 5
+
+""" 初始化pyautogui设置"""
+pyautogui.FAILSAFE = False
 
 class Execute():
 
@@ -13,15 +28,15 @@ class Execute():
             # handle: {
             #     path: str,
             #     lock: bool,
+            #     func: dict,
             #     data: dict,
             # }
         )
 
-
     def load(self, path):
         ret: dict = _readFile(path)
         if isinstance(ret, dict) and TestFactory.validJson(ret):
-            handleValue = { 'data': ret, 'path': path, 'lock': False }
+            handleValue = { 'data': ret, 'path': path, 'func': dict(), 'lock': False }
             self._handleList[id(handleValue)] = handleValue
             return id(handleValue)
         return 0
@@ -39,6 +54,21 @@ class Execute():
                 return True
             else:
                 pass  # 输出错误
+        return False
+    
+    # func(handle, name, dict)
+    def addFunction(self, handle, name, callback):
+        if handleValue := self._handleList.get(handle, None):
+            if name not in handleValue['func']:
+                handleValue['func'][name] = callback
+                return True
+        return False
+            
+    
+    def rmvFunction(self, name, handle):
+        if handleValue := self._handleList.get(handle, None):
+            handleValue['func'].pop(name)
+            return True
         return False
 
     def start(self, handle, caseId):  # 启动指定用例
