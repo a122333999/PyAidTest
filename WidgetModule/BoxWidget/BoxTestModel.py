@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 
 from PySide6.QtCore import QAbstractItemModel, Qt, QModelIndex
-from WidgetModule import ExecuteManager
+from WidgetModule import InstanceHub
 
 
 """
 ModelNode {
     icon: None
-    type: "case|action|hint|sep"
-    info: TestInfo
+    type: "root|case|action"
+    info: dict(测试信息)
     parent: ModelNode
     children: [ModelNode, ModelNode, ...]
     addition: {caseIden, actionIden}
@@ -20,12 +20,13 @@ class BoxTestModel(QAbstractItemModel):
 
     def __init__(self):
         super().__init__()
-        self._root = {"icon": None, "info": None, "type": "other", "parent": None, "children": [],
+        self._root = {"icon": None, "info": None, "type": "root", "parent": None, "children": [],
                       "addition": {"caseIden": None, "actionIden": None}}
         self._header = ["名称", "类型", "标识", "描述"]
 
     def updateModel(self, iden):
         self.beginResetModel()
+        self._root["children"].clear()
         _generateCase(iden, self._root)
         self.endResetModel()
 
@@ -57,15 +58,23 @@ class BoxTestModel(QAbstractItemModel):
         return len(self._header)
 
     def data(self, index, role=...):
-        if index.isValid():
-            node = index.internalPointer()
-            # 显示角色
-            if role == Qt.ItemDataRole.DisplayRole:
-                displays = self._retDisplays(node)
-                return displays[index.column()]
-            # 图标角色
-            elif role == Qt.ItemDataRole.DecorationRole:
-                return node["icon"]
+        if not index.isValid():
+            return None
+        
+        node = index.internalPointer()
+        if role == Qt.ItemDataRole.DisplayRole:
+            if node["type"] == "case" or node["type"] == "action":
+                if index.column() == 0:
+                    return node["info"]["baseName"]
+                elif index.column() == 1:
+                    return _retNodeTypeStr(node["type"])
+                elif index.column() == 2:
+                    return node["info"]["baseIden"]
+                elif index.column() == 3:
+                    return node["info"]["baseDesc"]
+        elif role == Qt.ItemDataRole.DecorationRole:
+            return node["icon"]
+        
         return None
 
     def setData(self, index, value, role=...):
@@ -82,125 +91,51 @@ class BoxTestModel(QAbstractItemModel):
     def flags(self, index):
         return super().flags(index)
 
-    @staticmethod
-    def _retDisplays(node):
-        result = []
-        if node["type"] == "sep":
-            result.append("")
-            result.append("")
-            result.append("")
-            result.append("")
-        elif node["type"] == "hint":
-            result.append(node["info"])
-            result.append("")
-            result.append("")
-            result.append("")
-        elif isinstance(node["info"], dict):
-            info = node["info"]
-            keys = {
-                "case": "测试用例",
-                "check": "检查动作",
-                "empty": "空动作",
-                "operate": "操作动作",
-                "control": "控制动作"
-            }
-            result.append(info["baseName"])
-            result.append(keys.get(info["baseType"], ""))
-            result.append(info["baseIden"])
-            result.append(info["baseDesc"])
 
-        return result
+def _retNodeTypeStr(t):
+    if t == "case":
+        return "测试用例"
+    elif t == "search":
+        return "搜索动作"
+    elif t == "operate":
+        return "操作动作"
+    elif t == "control":
+        return "控制动作"
+    elif t == "empty":
+        return "空动作"
+    return "未知类型"
 
 
 def _generateCase(entry, parent):
-    parent["children"].clear()
-    for caseInfo in ExecuteManager.getCaseList(entry):
+    for caseInfo in InstanceHub.execute.getCaseList(entry):
         # 创建用例节点
-        caseNode = _createCaseNode(caseInfo, parent)
-
-        # 收集动作信息
-        actionSet = dict()
-        for action in ExecuteManager.getActionList(entry, caseInfo["baseIden"]):
-            actionSet[action["baseIden"]] = action
-
-        # 生成动作链条
-        iden = caseInfo["caseStart"]
-        if iden in actionSet:
-            _generateAction(iden, actionSet, caseNode)
-
-        # 处理未使用的节点
-        if len(actionSet):
-            # _createSepNone(caseNode)
-            unNode = _createHintNone("未使用节点", caseNode)
-            for action in actionSet.values():
-                _createActionNode(action, unNode)
-            # _createSepNone(caseNode)
-
-
-def _generateAction(iden, actionSet, parent):
-    subset = list()
-    actInfo = actionSet.get(iden, None)
-    while actInfo:
-        # 创建节点
-        actNode = _createActionNode(actInfo, parent)
-
-        # 记录分叉节点
-        if goto_ := actInfo.get("controlForkGoto", None):
-            subset.append((goto_, actNode))
-
-        # 获取子节点标识
-        del actionSet[iden]
-        iden = actInfo.get("actionChild", None)
-        if iden is None:
-            _createHintNone(f" - 执行结束", parent)
-            break
-
-        # 获取子节点信息
-        actInfo = actionSet.get(iden, None)
-        if actInfo is None:
-            _createHintNone(f" → 跳转到{iden}", parent)
-            break
-
-    # 递归处理下一层级
-    for iden, node in subset:
-        if iden in actionSet:
-            _generateAction(iden, actionSet, node)
-        elif iden is not None:
-            _createHintNone(f" → 跳转到{iden}", node)
-        else:
-            _createHintNone(f" - 执行结束", node)
-
-
-def _createCaseNode(info, parent):
-    result = {
-        "icon": None,
-        "type": "case",
-        "info": info,
-        "parent": parent,
-        "children": [],
-        "addition": {
-            "caseIden": info.get("baseIden"),
-            "actionIden": None,
+        caseNode = {
+            "icon": None,
+            "type": "case",
+            "info": caseInfo,
+            "parent": parent,
+            "children": [],
+            "addition": {
+                "caseIden": caseInfo.get("baseIden"),
+                "actionIden": None,
+            }
         }
-    }
-    parent["children"].append(result)
-    return result
+        parent["children"].append(caseNode)
 
-
-def _createActionNode(info, parent):
-    result = {
-        "icon": None,
-        "type": "action",
-        "info": info,
-        "parent": parent,
-        "children": [],
-        "addition": {
-            "caseIden": parent["addition"]["caseIden"],
-            "actionIden": info.get("baseIden"),
-        }
-    }
-    parent["children"].append(result)
-    return result
+        # 创建动作节点
+        for actionInfo in InstanceHub.execute.getActionList(entry, caseInfo["baseIden"]):
+            actionNode = {
+                "icon": None,
+                "type": "action",
+                "info": actionInfo,
+                "parent": caseNode,
+                "children": [],
+                "addition": {
+                    "caseIden": caseNode["addition"]["caseIden"],
+                    "actionIden": actionInfo.get("baseIden"),
+                }
+            }
+            caseNode["children"].append(actionNode)
 
 
 def _createSepNone(parent):

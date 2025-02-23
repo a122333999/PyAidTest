@@ -7,3 +7,9 @@ class BoxHomeWidget(QWidget):
     def __init__(self):
         super().__init__()
         label = QLabel("BoxHomeWidget", self)
+
+    def setFilePath(self, filePath: str):
+        pass
+
+    def getFilePath(self):
+        return None

@@ -4,7 +4,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import QFileInfo
 from PySide6.QtWidgets import QVBoxLayout
 from PySide6.QtWidgets import QWidget, QTabWidget
-from WidgetModule import ProjectManager
+from WidgetModule import InstanceHub as InstanceHub
 from WidgetModule import ExecuteManager
 from WidgetModule.BoxWidget.BoxHomeWidget import BoxHomeWidget
 from WidgetModule.BoxWidget.BoxTestWidget import BoxTestWidget
@@ -46,69 +46,53 @@ class BoxWidget(QWidget):
             self._changeCurrentPage(filePath)
             return False
 
-        if entry := ProjectManager.pathToEntry(filePath):
-            entryFile, entryType = ProjectManager.getEntryInfo(entry)
+        if entry := InstanceHub.project.pathToEntry(filePath):
+            entryFile, entryType = InstanceHub.project.getEntryInfo(entry)
             if entryType == "test":
-                widget = BoxTestWidget(entryFile)
-                widget.setProperty("filePath", filePath)
+                widget = BoxTestWidget()
+                widget.setFilePath(filePath)
                 widget.nodeClicked.connect(self.onNoneClicked)
                 self._filePage.add(filePath)
                 self._tabWidget.addTab(widget, fileName)
                 self._tabWidget.setCurrentWidget(widget)
                 return True
             elif entryType == "script":
-                widget = BoxEditWidget(entryFile)
-                widget.setProperty("filePath", filePath)
+                widget = BoxEditWidget()
+                widget.setFilePath(filePath)
                 self._filePage.add(filePath)
                 self._tabWidget.addTab(widget, fileName)
                 self._tabWidget.setCurrentWidget(widget)
                 return True
             elif entryType == "resource":
-                widget = BoxImageWidget(entryFile)
-                widget.setProperty("filePath", filePath)
+                widget = BoxImageWidget()
+                widget.setFilePath(filePath)
                 self._filePage.add(filePath)
                 self._tabWidget.addTab(widget, fileName)
                 self._tabWidget.setCurrentWidget(widget)
                 return True
-        else:
-            widget = BoxImageWidget(filePath)
-            widget.setProperty("filePath", filePath)
-            self._filePage.add(filePath)
-            self._tabWidget.addTab(widget, fileName)
-            self._tabWidget.setCurrentWidget(widget)
-            return True
 
-        return False
-
-    def closeTabPage(self, absFilePath):
-        if absFilePath not in self._filePage:
-            return
-        for index in range(self._tabWidget.count()):
-            widget = self._tabWidget.widget(index)
-            if widget.property("filePath") == absFilePath:
-                self._tabWidget.removeTab(index)
-                break
+        widget = BoxEditWidget()
+        widget.setFilePath(filePath)
+        self._filePage.add(filePath)
+        self._tabWidget.addTab(widget, fileName)
+        self._tabWidget.setCurrentWidget(widget)
+        return True
 
     def clearTabPage(self):
         self._tabWidget.clear()
         self._filePage.clear()
         self._tabWidget.addTab(BoxHomeWidget(), "主页")
 
-    def refreshTabPage(self):
-        if widget := self._tabWidget.currentWidget():
-            if isinstance(widget, BoxTestWidget):
-                widget.refreshWidget()
-
     @QtCore.Slot(int)
     def onTabCloseRequested(self, index):
         widget = self._tabWidget.widget(index)
-        self._filePage.discard(widget.property("filePath"))
+        self._filePage.discard(widget.getFilePath())
         self._tabWidget.removeTab(index)
 
     @QtCore.Slot()
     def onCurrentTabChanged(self):
         if widget := self._tabWidget.currentWidget():
-            filePath = widget.property("filePath")
+            filePath = widget.getFilePath()
             self.currentPageChanged.emit(filePath)
 
     @QtCore.Slot(str, str, str)
@@ -121,6 +105,6 @@ class BoxWidget(QWidget):
     def _changeCurrentPage(self, filePath):
         for index in range(self._tabWidget.count()):
             widget = self._tabWidget.widget(index)
-            if widget.property("filePath") == filePath:
+            if widget.getFilePath() == filePath:
                 self._tabWidget.setCurrentIndex(index)
                 break

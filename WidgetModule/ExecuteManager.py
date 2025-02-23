@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 
-from PySide6.QtCore import QDir
+from PySide6.QtCore import QObject, QDir
 from ExecuteModule2.Execute import Execute
 
 
@@ -9,7 +9,7 @@ from ExecuteModule2.Execute import Execute
 
 -- Base 基础
 {
-    baseType: str(group);
+    baseType: str(file);
     baseIden: str(UUID);
     baseName: str(测试组名称);
     baseDesc: str(测试组描述);
@@ -42,7 +42,7 @@ from ExecuteModule2.Execute import Execute
 
 -- Search Action 测试动作
 {
-    baseType: str(check);
+    baseType: str(search);
     baseIden: str(UUID);
     baseName: str(测试动作名称);
     baseDesc: str(测试动作描述);
@@ -50,13 +50,13 @@ from ExecuteModule2.Execute import Execute
     actionClass: str(分类);
     actionDelay: int(延时);
     actionTimes: int(次数);
-    actionRetry: int(重试);
-    actionChild: str(UUID);
+    actionForce: bool(强制);
+    actionValid: bool(有效);
     
-    checkRectTop: str(顶边界);
-    checkRectLeft: str(左边界);
-    checkRectRight: str(右边界);
-    checkRectBottom: str(顶边界);
+    checkRectTop: str(顶边界)|None;
+    checkRectLeft: str(左边界)|None;
+    checkRectRight: str(右边界)|None;
+    checkRectBottom: str(顶边界)|None;
     checkOffsetTop: int(顶偏移);
     checkOffsetLeft: int(左偏移);
     checkOffsetRight: int(右偏移);
@@ -79,8 +79,8 @@ from ExecuteModule2.Execute import Execute
     actionClass: str(分类);
     actionDelay: int(延时);
     actionTimes: int(次数);
-    actionRetry: int(重试);
-    actionChild: str(UUID)|None;
+    actionForce: bool(强制);
+    actionValid: bool(有效);
     
     operatePoint: str(操作点);
     operateOffsetX: int(X偏移);
@@ -101,8 +101,8 @@ from ExecuteModule2.Execute import Execute
     actionClass: str(分类);
     actionDelay: int(延时);
     actionTimes: int(次数);
-    actionRetry: int(重试);
-    actionChild: str(UUID)|None;
+    actionForce: bool(强制);
+    actionValid: bool(有效);
     
     controlForkGoto: str(UUID)|None;
     controlForkEval: str(表达式);
@@ -114,340 +114,297 @@ from ExecuteModule2.Execute import Execute
 
 """
 
-_executeObj = Execute()
-_executeDir = QDir.current()
-_executeDict = dict()
 
 
-def init(execPath=""):
-    dir_ = QDir(execPath)
-    if dir_.exists():
-        global _executeDir
-        _executeDir = dir_
-        return True
-    return False
+class ExecuteManager(QObject):
+
+    def __init__(self):
+        super().__init__()
+        self._executeObj = Execute()
+        self._executeDir = QDir.current()
+        self._executeDict = dict()
+
+    def init(self, execPath=""):
+        if  QDir(execPath).exists():
+            self.uninit()
+            self._executeDir = QDir(execPath)
+            return True
+        return False
 
 
-def uninit():
-    global _executeObj, _executeDir, _executeDict
-    _executeDir = QDir.current()
-    for entry in _executeDict:
-        _executeObj.unload(_executeDict[entry])
-    _executeDict.clear()
+
+    def uninit(self):
+        for handle in self._executeDict.values():
+            self._executeObj.unload(handle)
+        self._executeDir = QDir.current()
+        self._executeDict.clear()
 
 
-def load(entry):
-    global _executeDict
-    if entry in _executeDict:
-        return True
-
-    path = _executeDir.filePath(entry)
-    handle = _executeObj.load(path)
-    if 0 < handle:
-        _executeDict[entry] = handle
-        return True
-
-    return False
+    def load(self, entry):
+        if entry not in self._executeDict:
+            path = self._executeDir.filePath(entry)
+            handle = self._executeObj.load(path)
+            if 0 < handle:
+                self._executeDict[entry] = handle
+                return True
+        return False
 
 
-def unload(entry):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        _executeObj.unload(_executeDict[entry])
-        _executeDict.pop(entry)
+    def unload(self, entry):
+        if handle := self._executeDict.get(entry, None):
+            self._executeObj.unload(handle)
+            self._executeDict.pop(entry)
 
 
-def save(entry):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        return _executeObj.save(_executeDict[entry])
-    return False
+    def save(self, entry):
+        if handle := self._executeDict.get(entry, None):
+            return self._executeObj.save(handle)
+        return False
 
 
-def saveAs(entry, path):
-    pass
+    def saveAs(entry, path):
+        pass
 
 
-def start(entry, index):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        return _executeObj.start(_executeDict[entry], index)
-    return False
+    def start(entry, index):
+        pass
 
 
-def getFileList():
-    global _executeObj
-    result = list()
-    for ret in _executeObj.getHandleList():
-        result.append({
-            "baseType": str("group"),
-            "baseIden": str(ret["iden"]),
-            "baseName": str(ret["name"]),
-            "baseDesc": str(ret["desc"]),
-        })
-    return result
-
-
-def getFileInfo(entry):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        if ret := _executeObj.getHandleInfo(_executeDict[entry]):
-            return {
+    def getFileList(self):
+        result = list()
+        for ret in self._executeObj.getHandleList():
+            result.append({
                 "baseType": str("group"),
                 "baseIden": str(ret["iden"]),
                 "baseName": str(ret["name"]),
                 "baseDesc": str(ret["desc"]),
-            }
-
-
-def setFileInfo(entry, info):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        return _executeObj.setHandleInfo(_executeDict[entry], {
-            "type": "group",
-            "iden": str(info["baseIden"]),
-            "name": str(info["baseName"]),
-            "desc": str(info["baseDesc"]),
-        })
-    return False
-
-
-def getCaseList(entry):
-    global _executeObj, _executeDict
-    result = list()
-    if entry in _executeDict:
-        for ret in _executeObj.getCaseList(_executeDict[entry]):
-            result.append({
-                "baseType": str("case"),
-                "baseIden": str(ret["iden"]),
-                "baseName": str(ret["name"]),
-                "baseDesc": str(ret["desc"]),
-                "caseStart": ret["start"] if isinstance(ret["start"], str) else None,
-                "caseActive": bool(ret["active"])
             })
-    return result
+        return result
 
 
-def getCaseInfo(entry, index):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        if ret := _executeObj.getCaseInfo(_executeDict[entry], index):
-            return {
-                "baseType": str("case"),
-                "baseIden": str(ret["iden"]),
-                "baseName": str(ret["name"]),
-                "baseDesc": str(ret["desc"]),
-                "caseStart": ret["start"] if isinstance(ret["start"], str) else None,
-                "caseActive": bool(ret["active"])
-            }
+    def getFileInfo(self, entry):
+        if handle := self._executeDict.get(entry, None):
+            if ret := self._executeObj.getHandleInfo(handle):
+                return {
+                    "baseType": str("group"),
+                    "baseIden": str(ret["iden"]),
+                    "baseName": str(ret["name"]),
+                    "baseDesc": str(ret["desc"]),
+                }
 
 
-def setCaseInfo(entry, index, info):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        return _executeObj.setCaseInfo(_executeDict[entry], index, {
-            "type": "case",
-            "iden": str(info["baseIden"]),
-            "name": str(info["baseName"]),
-            "desc": str(info["baseDesc"]),
-            "start": info["caseStart"] if isinstance(info["caseStart"], str) else None,
-            "active": bool(info["caseActive"])
-        })
-    return False
-
-
-def getActionList(entry, index):
-    global _executeObj, _executeDict
-    result = list()
-    if entry in _executeDict:
-        for ret in _executeObj.getActionList(_executeDict[entry], index):
-            result.append({
-                "baseType": str("empty"),
-                "baseIden": str(ret["iden"]),
-                "baseName": str(ret["name"]),
-                "baseDesc": str(ret["desc"]),
-                "actionClass": str(ret["class"]),
-                "actionDelay": int(ret["delay"]),
-                "actionTimes": int(ret["times"]),
-                "actionRetry": int(ret["retry"]),
-                "actionChild": str(ret["child"]) if ret["child"] else None,
+    def setFileInfo(self, entry, info):
+        if handle := self._executeDict.get(entry, None):
+            return self._executeObj.setHandleInfo(handle, {
+                "type": "group",
+                "iden": str(info["baseIden"]),
+                "name": str(info["baseName"]),
+                "desc": str(info["baseDesc"]),
             })
-            config = ret["config"]
-            if "check" == ret["type"]:
-                result[-1].update({
-                    "baseType": str("check"),
-                    "checkRectTop": str(config["rect"]["top"]) if config["rect"]["top"] else None,
-                    "checkRectLeft": str(config["rect"]["left"]) if config["rect"]["left"] else None,
-                    "checkRectRight": str(config["rect"]["right"]) if config["rect"]["right"] else None,
-                    "checkRectBottom": str(config["rect"]["bottom"]) if config["rect"]["bottom"] else None,
-                    "checkOffsetTop": int(config["offset"]["top"]),
-                    "checkOffsetLeft": int(config["offset"]["left"]),
-                    "checkOffsetRight": int(config["offset"]["right"]),
-                    "checkOffsetBottom": int(config["offset"]["bottom"]),
-                    "checkSource": str(config["source"]),
-                    "checkTargets": [str(item) for item in config["targets"]],
-                    "checkHit": int(config["hit"]),
-                    "checkCount": int(config["count"]),
-                    "checkDuration": int(config["duration"]),
-                })
-            if "operate" == ret["type"]:
-                result[-1].update({
-                    "baseType": str("operate"),
-                    "operatePoint": str(config["point"]),
-                    "operateOffsetX": int(config["offset"]["x"]),
-                    "operateOffsetY": int(config["offset"]["y"]),
-                    "operateTime": int(config["time"]),
-                    "operateRoll": int(config["roll"]),
-                    "operateKeys": [str(item) for item in config["keys"]],
-                    "operateContent": str(config["content"]),
-                })
-            if "control" == ret["type"]:
-                result[-1].update({
-                    "baseType": str("control"),
-                    "controlForkGoto": str(config["fork"]["goto"]),
-                    "controlForkEval": str(config["fork"]["eval"]),
-                    "controlInputTips": str(config["input"]["tips"]),
-                    "controlInputForm": str(config["input"]["form"]),
-                    "controlScriptPath": str(config["script"]["path"]),
-                    "controlScriptArgs": str(config["script"]["args"]),
-                })
-    return result
+        return False
 
 
-def getActionInfo(entry, index, uuid):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        if ret := _executeObj.getActionInfo(_executeDict[entry], index, uuid):
+    def getCaseList(self, entry):
+        result = list()
+        if handle := self._executeDict.get(entry, None):
+            for ret in self._executeObj.getCaseList(handle):
+                result.append({
+                    "baseType": str("case"),
+                    "baseIden": str(ret["iden"]),
+                    "baseName": str(ret["name"]),
+                    "baseDesc": str(ret["desc"]),
+                    "caseTimes": int(ret["times"]),
+                    "caseActive": bool(ret["active"])
+                })
+        return result
+
+
+    def getCaseInfo(self, entry, caseId):
+        if handle := self._executeDict.get(entry, None):
+            if ret := self._executeObj.getCaseInfo(handle, caseId):
+                return {
+                    "baseType": str("case"),
+                    "baseIden": str(ret["iden"]),
+                    "baseName": str(ret["name"]),
+                    "baseDesc": str(ret["desc"]),
+                    "caseTimes": int(ret["times"]),
+                    "caseActive": bool(ret["active"])
+                }
+
+
+    def setCaseInfo(self, entry, caseId, info):
+        if handle := self._executeDict.get(entry, None):
+            return self._executeObj.setCaseInfo(handle, caseId, {
+                "type": "case",
+                "iden": str(info["baseIden"]),
+                "name": str(info["baseName"]),
+                "desc": str(info["baseDesc"]),
+                "times": int(info["caseTimes"]),
+                "active": bool(info["caseActive"])
+            })
+        return False
+
+
+    def getActionList(self, entry, caseId):
+        result = list()
+        if handle := self._executeDict.get(entry, None):
+            for ret in self._executeObj.getActionList(handle, caseId):
+                result.append({
+                    "baseType": str("empty"),
+                    "baseIden": str(ret["iden"]),
+                    "baseName": str(ret["name"]),
+                    "baseDesc": str(ret["desc"]),
+                    "actionClass": str(ret["class"]),
+                    "actionDelay": int(ret["delay"]),
+                    "actionTimes": int(ret["times"]),
+                    "actionForce": bool(ret["force"]),
+                    "actionValid": bool(ret["valid"]),
+                })
+                config = ret["config"]
+                if "search" == ret["type"]:
+                    result[-1].update({
+                        "baseType": str("search"),
+                        "checkRectTop": str(config["rect"]["top"]) if config["rect"]["top"] else None,
+                        "checkRectLeft": str(config["rect"]["left"]) if config["rect"]["left"] else None,
+                        "checkRectRight": str(config["rect"]["right"]) if config["rect"]["right"] else None,
+                        "checkRectBottom": str(config["rect"]["bottom"]) if config["rect"]["bottom"] else None,
+                        "checkOffsetTop": int(config["offset"]["top"]),
+                        "checkOffsetLeft": int(config["offset"]["left"]),
+                        "checkOffsetRight": int(config["offset"]["right"]),
+                        "checkOffsetBottom": int(config["offset"]["bottom"]),
+                        "checkSource": str(config["source"]),
+                        "checkTargets": [str(item) for item in config["targets"]],
+                        "checkHit": int(config["hit"]),
+                        "checkCount": int(config["count"]),
+                        "checkDuration": int(config["duration"]),
+                    })
+                if "operate" == ret["type"]:
+                    result[-1].update({
+                        "baseType": str("operate"),
+                        "operatePoint": str(config["point"]),
+                        "operateOffsetX": int(config["offset"]["x"]),
+                        "operateOffsetY": int(config["offset"]["y"]),
+                        "operateTime": int(config["time"]),
+                        "operateRoll": int(config["roll"]),
+                        "operateKeys": [str(item) for item in config["keys"]],
+                        "operateContent": str(config["copy"]),
+                    })
+                if "control" == ret["type"]:
+                    result[-1].update({
+                        "baseType": str("control"),
+                    })
+        return result
+
+    def getActionInfo(self, entry, caseId, actionId):
+        if handle := self._executeDict.get(entry, None):
+            if ret := self._executeObj.getActionInfo(handle, caseId, actionId):
+                result = {
+                    "baseType": str("empty"),
+                    "baseIden": str(ret["iden"]),
+                    "baseName": str(ret["name"]),
+                    "baseDesc": str(ret["desc"]),
+                    "actionClass": str(ret["class"]),
+                    "actionDelay": int(ret["delay"]),
+                    "actionTimes": int(ret["times"]),
+                    "actionForce": bool(ret["force"]),
+                    "actionValid": bool(ret["valid"]),
+                }
+                config = ret["config"]
+                if "search" == ret["type"]:
+                    result.update({
+                        "baseType": str("search"),
+                        "checkRectTop": str(config["rect"]["top"]) if config["rect"]["top"] else None,
+                        "checkRectLeft": str(config["rect"]["left"]) if config["rect"]["left"] else None,
+                        "checkRectRight": str(config["rect"]["right"]) if config["rect"]["right"] else None,
+                        "checkRectBottom": str(config["rect"]["bottom"]) if config["rect"]["bottom"] else None,
+                        "checkOffsetTop": int(config["offset"]["top"]),
+                        "checkOffsetLeft": int(config["offset"]["left"]),
+                        "checkOffsetRight": int(config["offset"]["right"]),
+                        "checkOffsetBottom": int(config["offset"]["bottom"]),
+                        "checkSource": str(config["source"]),
+                        "checkTargets": [str(item) for item in config["targets"]],
+                        "checkHit": int(config["hit"]),
+                        "checkCount": int(config["count"]),
+                        "checkDuration": int(config["duration"]),
+                    })
+                if "operate" == ret["type"]:
+                    result.update({
+                        "baseType": str("operate"),
+                        "operatePoint": str(config["point"]),
+                        "operateOffsetX": int(config["offset"]["x"]),
+                        "operateOffsetY": int(config["offset"]["y"]),
+                        "operateTime": int(config["time"]),
+                        "operateRoll": int(config["roll"]),
+                        "operateKeys": [str(item) for item in config["keys"]],
+                        "operateContent": str(config["copy"]),
+                    })
+                if "control" == ret["type"]:
+                    result.update({
+                        "baseType": str("control"),
+                    })
+                return result
+
+    def setActionInfo(self, entry, caseId, actionId, info):
+        if handle := self._executeDict.get(entry, None):
             temp = {
-                "baseType": str("empty"),
-                "baseIden": str(ret["iden"]),
-                "baseName": str(ret["name"]),
-                "baseDesc": str(ret["desc"]),
-                "actionClass": str(ret["class"]),
-                "actionDelay": int(ret["delay"]),
-                "actionTimes": int(ret["times"]),
-                "actionRetry": int(ret["retry"]),
-                "actionChild": str(ret["child"]) if ret["child"] else None,
+                "type": str("empty"),
+                "iden": str(info["baseIden"]),
+                "name": str(info["baseName"]),
+                "desc": str(info["baseDesc"]),
+                "class": str(info["actionClass"]),
+                "delay": int(info["actionDelay"]),
+                "times": int(info["actionTimes"]),
+                "force": bool(info["actionForce"]),
+                "valid": bool(info["actionValid"]),
+                "config": {}  # 不能删除
             }
-            config = ret["config"]
-            if "check" == ret["type"]:
+            if "search" == info["baseType"]:
                 temp.update({
-                    "baseType": str("check"),
-                    "checkRectTop": str(config["rect"]["top"]) if config["rect"]["top"] else None,
-                    "checkRectLeft": str(config["rect"]["left"]) if config["rect"]["left"] else None,
-                    "checkRectRight": str(config["rect"]["right"]) if config["rect"]["right"] else None,
-                    "checkRectBottom": str(config["rect"]["bottom"]) if config["rect"]["bottom"] else None,
-                    "checkOffsetTop": int(config["offset"]["top"]),
-                    "checkOffsetLeft": int(config["offset"]["left"]),
-                    "checkOffsetRight": int(config["offset"]["right"]),
-                    "checkOffsetBottom": int(config["offset"]["bottom"]),
-                    "checkSource": str(config["source"]),
-                    "checkTargets": [str(item) for item in config["targets"]],
-                    "checkHit": int(config["hit"]),
-                    "checkCount": int(config["count"]),
-                    "checkDuration": int(config["duration"]),
+                    "type": str("search"),
+                    "config": {
+                        "rect": {
+                            "top": str(info["checkRectTop"]) if isinstance(info["checkRectTop"], str) else None,
+                            "left": str(info["checkRectLeft"]) if isinstance(info["checkRectLeft"], str) else None,
+                            "right": str(info["checkRectRight"]) if isinstance(info["checkRectRight"], str) else None,
+                            "bottom": str(info["checkRectBottom"]) if isinstance(info["checkRectBottom"], str) else None,
+                        },
+                        "offset": {
+                            "top": int(info["checkOffsetTop"]),
+                            "left": int(info["checkOffsetLeft"]),
+                            "right": int(info["checkOffsetRight"]),
+                            "bottom": int(info["checkOffsetBottom"])
+                        },
+                        "source": str(info["checkSource"]),
+                        "targets": [str(item) for item in info["checkTargets"]],
+                        "hit": int(info["checkHit"]),
+                        "count": int(info["checkCount"]),
+                        "duration": int(info["checkDuration"])
+                    }
                 })
-            if "operate" == ret["type"]:
+            elif "operate" == info["baseType"]:
                 temp.update({
-                    "baseType": str("operate"),
-                    "operatePoint": str(config["point"]),
-                    "operateOffsetX": int(config["offset"]["x"]),
-                    "operateOffsetY": int(config["offset"]["y"]),
-                    "operateTime": int(config["time"]),
-                    "operateRoll": int(config["roll"]),
-                    "operateKeys": [str(item) for item in config["keys"]],
-                    "operateContent": str(config["content"]),
+                    "type": str("operate"),
+                    "config": {
+                        "point": str(info["operatePoint"]),
+                        "offset": {
+                            "x": int(info["operateOffsetX"]),
+                            "y": int(info["operateOffsetY"]),
+                        },
+                        "time": int(info["operateTime"]),
+                        "roll": int(info["operateRoll"]),
+                        "keys": [str(item) for item in info["operateKeys"]],
+                        "copy": str(info["operateContent"]),
+                    }
                 })
-            if "control" == ret["type"]:
+            elif "control" == info["baseType"]:
                 temp.update({
-                    "baseType": str("control"),
-                    "controlForkGoto": str(config["fork"]["goto"]),
-                    "controlForkEval": str(config["fork"]["eval"]),
-                    "controlInputTips": str(config["input"]["tips"]),
-                    "controlInputForm": str(config["input"]["form"]),
-                    "controlScriptPath": str(config["script"]["path"]),
-                    "controlScriptArgs": str(config["script"]["args"]),
+                    "type": str("control"),
+                    "config": {}
                 })
-            return temp
 
+            return self._executeObj.setActionInfo(handle, caseId, actionId, temp)
+        return False
 
-def setActionInfo(entry, index, uuid, info):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        temp = {
-            "type": str("empty"),
-            "iden": str(info["baseIden"]),
-            "name": str(info["baseName"]),
-            "desc": str(info["baseDesc"]),
-            "class": str(info["actionClass"]),
-            "delay": int(info["actionDelay"]),
-            "times": int(info["actionTimes"]),
-            "retry": int(info["actionRetry"]),
-            "child": str(info["actionChild"]) if isinstance(info["actionChild"], str) else None,
-            "config": {}  # 不能删除
-        }
-        if "check" == info["baseType"]:
-            temp.update({
-                "type": str("check"),
-                "config": {
-                    "rect": {
-                        "top": str(info["checkRectTop"]) if isinstance(info["checkRectTop"], str) else None,
-                        "left": str(info["checkRectLeft"]) if isinstance(info["checkRectLeft"], str) else None,
-                        "right": str(info["checkRectRight"]) if isinstance(info["checkRectRight"], str) else None,
-                        "bottom": str(info["checkRectBottom"]) if isinstance(info["checkRectBottom"], str) else None,
-                    },
-                    "offset": {
-                        "top": int(info["checkOffsetTop"]),
-                        "left": int(info["checkOffsetLeft"]),
-                        "right": int(info["checkOffsetRight"]),
-                        "bottom": int(info["checkOffsetBottom"])
-                    },
-                    "source": str(info["checkSource"]),
-                    "targets": [str(item) for item in info["checkTargets"]],
-                    "hit": int(info["checkHit"]),
-                    "count": int(info["checkCount"]),
-                    "duration": int(info["checkDuration"])
-                }
-            })
-        elif "operate" == info["baseType"]:
-            temp.update({
-                "type": str("operate"),
-                "config": {
-                    "point": str(info["operatePoint"]),
-                    "offset": {
-                        "x": int(info["operateOffsetX"]),
-                        "y": int(info["operateOffsetY"]),
-                    },
-                    "time": int(info["operateTime"]),
-                    "roll": int(info["operateRoll"]),
-                    "keys": [str(item) for item in info["operateKeys"]],
-                    "content": str(info["operateContent"]),
-                }
-            })
-        elif "control" == info["baseType"]:
-            temp.update({
-                "type": str("control"),
-                "config": {
-                    "fork": {
-                        "eval": str(info["controlForkEval"]),
-                        "goto": str(info["controlForkGoto"]) if info["controlForkGoto"] else None,
-                    },
-                    "Input": {
-                        "tips": str(info["controlInputTips"]),
-                        "form": str(info["controlInputForm"]),
-                    },
-                    "script": {
-                        "path": str(info["controlScriptPath"]),
-                        "args": str(info["controlScriptArgs"]),
-                    },
-                }
-            })
-
-        return _executeObj.setActionInfo(_executeDict[entry], index, uuid, temp)
-    return False
-
-
-def hasHandle(entry):
-    global _executeObj, _executeDict
-    if entry in _executeDict:
-        return _executeObj.hasHandle(_executeDict[entry])
+    def hasHandle(self, entry):
+        if handle := self._executeDict.get(entry, None):
+            return self._executeObj.hasHandle(handle)

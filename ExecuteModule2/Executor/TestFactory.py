@@ -14,6 +14,12 @@ class TestFactory:
     caseKey = TestFile.fileCasesKey
     actionKey = TestCase.caseActionsKey
 
+    baseTypeKey = TestFile.baseTypeKey
+    baseIdenKey = TestFile.baseIdenKey
+    baseNameKey = TestFile.baseNameKey
+    baseDescKey = TestFile.baseDescKey
+
+
     @classmethod
     def validJson(cls, testFile: dict):
         if not TestFile.validJson(testFile):
@@ -36,13 +42,7 @@ class TestFactory:
     
     @classmethod
     def copyTestActionData(cls, testAction: dict):
-        return {
-            cls.baseTypeKey: testAction[cls.baseTypeKey],
-            cls.baseIdenKey: testAction[cls.baseTypeKey],
-            cls.baseNameKey: testAction[cls.baseTypeKey],
-            cls.baseDescKey: testAction[cls.baseTypeKey],
-            #TODO: Add more keys
-        }
+        return TestAction.copyData(testAction, False)
     
     @classmethod
     def updateTestFileHeader(cls, testFile: dict, info: dict):

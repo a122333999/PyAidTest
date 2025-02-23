@@ -40,11 +40,23 @@ class TestActionControl(TestAction.TestAction):
 
     @classmethod
     def copyData(cls, testAction: dict, onlyHeader=True):
-        pass
+        return {
+            cls.baseTypeKey: testAction[cls.baseTypeKey],
+            cls.baseIdenKey: testAction[cls.baseIdenKey],
+            cls.baseNameKey: testAction[cls.baseNameKey],
+            cls.baseDescKey: testAction[cls.baseDescKey],
+            cls.actionClassKey: testAction[cls.actionClassKey],
+            cls.actionDelayKey: testAction[cls.actionDelayKey],
+            cls.actionTimesKey: testAction[cls.actionTimesKey],
+            cls.actionForceKey: testAction[cls.actionForceKey],
+            cls.actionValidKey: testAction[cls.actionValidKey],
+            cls.actionConfigKey: dict()
+            #TODO: Add more keys
+        }
 
     @classmethod
     def updateData(cls, testAction: dict, info: dict):
-        pass
+        return False
 
 
 TestAction.controlActionClass = TestActionControl

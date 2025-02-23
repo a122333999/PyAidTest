@@ -60,7 +60,28 @@ class TestActionOperate(TestAction.TestAction):
 
     @classmethod
     def copyData(cls, testAction: dict, onlyHeader=True):
-        pass
+        return {
+            cls.baseTypeKey: testAction[cls.baseTypeKey],
+            cls.baseIdenKey: testAction[cls.baseIdenKey],
+            cls.baseNameKey: testAction[cls.baseNameKey],
+            cls.baseDescKey: testAction[cls.baseDescKey],
+            cls.actionClassKey: testAction[cls.actionClassKey],
+            cls.actionDelayKey: testAction[cls.actionDelayKey],
+            cls.actionTimesKey: testAction[cls.actionTimesKey],
+            cls.actionForceKey: testAction[cls.actionForceKey],
+            cls.actionValidKey: testAction[cls.actionValidKey],
+            cls.actionConfigKey: {
+                'point': testAction[cls.actionConfigKey]['point'],
+                'offset': {
+                    'x': testAction[cls.actionConfigKey]['offset']['x'],
+                    'y': testAction[cls.actionConfigKey]['offset']['y']
+                },
+                'time': testAction[cls.actionConfigKey]['time'],
+                'keys': list(testAction[cls.actionConfigKey]['keys']),
+                'roll': testAction[cls.actionConfigKey]['roll'],
+                'copy': testAction[cls.actionConfigKey]['copy']
+            }
+        }
 
     @classmethod
     def updateData(cls, testAction: dict, info: dict):

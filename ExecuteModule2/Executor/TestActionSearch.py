@@ -73,10 +73,39 @@ class TestActionSearch(TestAction.TestAction):
 
     @classmethod
     def copyData(cls, testAction: dict, onlyHeader=True):
-        pass
+        return {
+            cls.baseTypeKey: testAction[cls.baseTypeKey],
+            cls.baseIdenKey: testAction[cls.baseIdenKey],
+            cls.baseNameKey: testAction[cls.baseNameKey],
+            cls.baseDescKey: testAction[cls.baseDescKey],
+            cls.actionClassKey: testAction[cls.actionClassKey],
+            cls.actionDelayKey: testAction[cls.actionDelayKey],
+            cls.actionTimesKey: testAction[cls.actionTimesKey],
+            cls.actionForceKey: testAction[cls.actionForceKey],
+            cls.actionValidKey: testAction[cls.actionValidKey],
+            cls.actionConfigKey: {
+                'rect': {
+                    'top': testAction[cls.actionConfigKey]['rect']['top'],
+                    'left': testAction[cls.actionConfigKey]['rect']['left'],
+                    'right': testAction[cls.actionConfigKey]['rect']['right'],
+                    'bottom': testAction[cls.actionConfigKey]['rect']['bottom'],
+                },
+                'offset': {
+                    'top': testAction[cls.actionConfigKey]['offset']['top'],
+                    'left': testAction[cls.actionConfigKey]['offset']['left'],
+                    'right': testAction[cls.actionConfigKey]['offset']['right'],
+                    'bottom': testAction[cls.actionConfigKey]['offset']['bottom'],
+                },
+                'source': testAction[cls.actionConfigKey]['source'],
+                'targets': [target for target in testAction[cls.actionConfigKey]['targets']],
+                'hit': testAction[cls.actionConfigKey]['hit'],
+                'count': testAction[cls.actionConfigKey]['count'],
+                'duration': testAction[cls.actionConfigKey]['duration']
+            }
+        }
 
     @classmethod
     def updateData(cls, testAction: dict, info: dict):
-        pass
+        return False
 
 TestAction.searchActionClass = TestActionSearch

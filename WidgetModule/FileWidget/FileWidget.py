@@ -6,7 +6,7 @@ from PySide6.QtGui import QAction, QCursor, QDesktopServices
 from PySide6.QtWidgets import QWidget, QTreeView, QVBoxLayout, QMenu, QInputDialog, QMessageBox
 from WidgetModule.FileWidget.FileModel import FileModel
 from WidgetModule.LogWidget import LogInst as log
-from WidgetModule import ProjectManager
+from WidgetModule import InstanceHub as InstanceHub
 from WidgetModule import ExecuteManager
 
 
@@ -88,7 +88,6 @@ class FileWidget(QWidget):
                 self._showInExplorerAct.setVisible(True)
             else:
                 return True
-                pass
 
             act = self._fileMenu.exec(QCursor.pos())
             if act is self._createTestFileAct:
@@ -161,14 +160,14 @@ def _createTestFile(parent, path):
     text, ret = QInputDialog.getText(parent, "创建测试文件", "文件名称", text="TestFile.test")
     if not ret or len(text) == 0:
         return
-    ret = ProjectManager.createTestFile(path, text)
+    ret = InstanceHub.project.createTestFile(path, text)
     if ret is None:
         log.error("创建失败")
         return
-    if not ProjectManager.addTestFile(ret):
+    if not InstanceHub.project.addTestFile(ret):
         log.error("添加失败")
         return
-    entry = ProjectManager.pathToEntry(ret)
+    entry = InstanceHub.project.pathToEntry(ret)
     if entry is None:
         log.error("添加失败")
         return
@@ -176,7 +175,7 @@ def _createTestFile(parent, path):
         log.error("新测试文件加载失败")
         return
 
-    ProjectManager.setModified(True)
+    InstanceHub.project.setModified(True)
     log.info("创建成功")
 
 
@@ -192,10 +191,10 @@ def _deleteFile(parent, path):
     ret = QMessageBox.question(parent, "删除文件", "确认删除文件?")
     if ret != QMessageBox.StandardButton.Yes:
         return
-    if entry := ProjectManager.pathToEntry(path):
-        ProjectManager.rmvEntry(entry)
+    if entry := InstanceHub.project.pathToEntry(path):
+        InstanceHub.project.rmvEntry(entry)
     QFile(path).remove()
-    ProjectManager.setModified(True)
+    InstanceHub.project.setModified(True)
     log.info("删除成功")
 
 
@@ -206,7 +205,7 @@ def _excludeFile(parent, path):
     ret = QMessageBox.question(parent, "排除文件", "确认排除文件?")
     if ret != QMessageBox.StandardButton.Yes:
         return
-    if entry := ProjectManager.pathToEntry(path):
-        ProjectManager.rmvEntry(entry)
-    ProjectManager.setModified(True)
+    if entry := InstanceHub.project.pathToEntry(path):
+        InstanceHub.project.rmvEntry(entry)
+    InstanceHub.project.setModified(True)
     log.info("排除成功")

@@ -6,14 +6,20 @@ import uuid
 from PySide6.QtCore import QFileInfo, QDir, QObject
 from ProjectModule import ProjectTemplate
 
+# TODO: 打开任意文件都成功
 
 class Project(QObject):
+
+    ProjectModifiedEvent = 0
+    ProjectLoadedEvent = 1
+    ProjectSavedEvent = 2
 
     def __init__(self):
         super().__init__()
         self._data = None
         self._dirPath = None
         self._filePath = None
+        self._modified = False
 
     def load(self, file):
         try:
@@ -36,8 +42,17 @@ class Project(QObject):
             print("保存项目文件失败", e)
         return False
 
+    def unload(self):
+        pass
+
     def isEmpty(self):
         return self._isEmpty()
+    
+    def isModified(self):
+        return self._modified
+    
+    def setModified(self, modified):
+        self._modified = modified
 
     def hasEntry(self, entry):
         return self._hasEntry(entry)
